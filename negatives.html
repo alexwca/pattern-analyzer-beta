@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ANÁLISE DE RANKING</title>
+    <style>
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid rgb(158, 158, 158);
+            padding: 8px;
+            text-align: left;
+            color: rgb(52, 52, 52);
+        }
+
+        textarea {
+            resize: none;
+            min-width: 400px;
+            height: 200px;
+        }
+
+        #filterExpose {
+            text-transform: uppercase;
+        }
+
+        #filter {
+            padding: 5px 10px;
+        }
+
+        button {
+            margin: 10px 0;
+            padding: 5px 10px;
+        }
+
+        table {
+            display: none;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #dbdbdb;
+        }
+
+        .gray {
+            background-color: #f2f2f2;
+        }
+
+        .negative {
+            background-color: #ffcccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ANÁLISE DE RANKING</h1>
+    <label for="filter">Escolha o filtro de análise:</label>
+    <select id="filter">
+        <option value="highScoring" data-weight="2">OVER 3.5</option>
+        <option value="veryHighScoring" data-weight="3">5+</option>
+        <option value="homeWins" data-weight="1">Casa vence</option>
+        <option value="awayWins" data-weight="1">Visitante vence</option>
+        <option value="draw" data-weight="1">Empate</option>
+    </select>
+    <br><br>
+    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos aqui..."></textarea>
+    <br>
+    <button onclick="processData()">ANALISAR</button>
+    <button onclick="clearData()">LIMPAR</button>
+
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>TIME</th>
+                <th>PONTOS</th>
+                <th>PARTIDAS JOGADAS</th>
+                <th>JOGOS <span id="filterExpose"></span></th>
+                <th>% &nbsp;
+                    <button id="btn-up" onclick="sortByPercentage()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z" />
+                        </svg>
+                    </button>
+
+                    <button id="btn-down" onclick="processData()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </button>
+                </th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <table id="negativeResults" style="display: none;">
+        <thead>
+            <tr>
+                <th colspan="20">NEGATIVAS</th>
+            </tr>
+        </thead>
+        <tbody id="negativeBody"></tbody>
+    </table>
+
+    <script>
+        let teamStats = {}; // Variável global para armazenar estatísticas dos times
+
+        function processData() {
+            let data = document.getElementById('dataInput').value;
+            let filter = document.getElementById('filter').value;
+            document.getElementById('btn-down').style.display = 'none';
+            document.getElementById('btn-up').style.display = 'block';
+
+            switch (filter) {
+                case 'highScoring':
+                    document.getElementById('filterExpose').innerText = 'OVER 3.5';
+                    break;
+                case 'veryHighScoring':
+                    document.getElementById('filterExpose').innerText = '5+';
+                    break;
+                case 'homeWins':
+                    document.getElementById('filterExpose').innerText = 'Casa Vence';
+                    break;
+                case 'awayWins':
+                    document.getElementById('filterExpose').innerText = 'Visitante Vence';
+                    break;
+                case 'draw':
+                    document.getElementById('filterExpose').innerText = 'Empate';
+                    break;
+            }
+
+            data = data.replace(/['"]+/g, '');
+
+            const games = data.trim().split(/\t|\n/);
+
+            const matches = [];
+            for (let i = 0; i < games.length; i += 2) {
+                const teams = games[i].trim();
+                const score = games[i + 1].trim();
+                matches.push({ teams, score });
+            }
+
+            teamStats = {}; // Limpa os dados anteriores
+            matches.forEach(match => {
+                const [team1, team2] = match.teams.split(' x ');
+                const [score1, score2] = match.score.split('-').map(Number);
+                const totalGoals = score1 + score2;
+
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { gamesList: [], highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { gamesList: [], highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
+                }
+
+                // Armazenar detalhes de cada jogo
+                teamStats[team1].gamesList.push({ teams: match.teams, score: match.score, totalGoals });
+                teamStats[team2].gamesList.push({ teams: match.teams, score: match.score, totalGoals });
+
+                teamStats[team1].totalGames++;
+                teamStats[team2].totalGames++;
+
+                if (totalGoals >= 3.5) {
+                    teamStats[team1].highScoringGames++;
+                    teamStats[team2].highScoringGames++;
+                }
+                if (totalGoals >= 5) {
+                    teamStats[team1].veryHighScoringGames++;
+                    teamStats[team2].veryHighScoringGames++;
+                }
+                if (score1 > score2) {
+                    teamStats[team1].homeWins++;
+                    teamStats[team1].points += 3;
+                } else if (score2 > score1) {
+                    teamStats[team2].awayWins++;
+                    teamStats[team2].points += 3;
+                } else {
+                    teamStats[team1].draws++;
+                    teamStats[team2].draws++;
+                    teamStats[team1].points += 1;
+                    teamStats[team2].points += 1;
+                }
+            });
+
+            const filterOption = document.getElementById('filter').value;
+            const filterWeight = parseInt(document.getElementById('filter').selectedOptions[0].getAttribute('data-weight'));
+            const tbody = document.getElementById('resultsTable').querySelector('tbody');
+            tbody.innerHTML = '';
+
+            const results = [];
+            Object.keys(teamStats).forEach(team => {
+                const games = getGamesByFilter(teamStats[team], filterOption);
+                const totalGames = teamStats[team].totalGames;
+                const points = teamStats[team].points;
+                const participationPoints = games * filterWeight;
+
+                results.push({ team, games, totalGames, points, participationPoints });
+            });
+
+            // Ordenar apenas os resultados para o ranking (excluindo os primeiros 20 jogos)
+            const filteredResults = results.filter(result => result.team !== 'notInFive')
+                .slice(5);
+
+            relationMatches(filteredResults);
+
+            filteredResults.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td>${result.team}</td>
+                  <td>${result.points}</td>
+                  <td>${result.totalGames}</td>
+                  <td>${result.games}</td>
+                  <td>${(result.games / result.totalGames * 100).toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+                document.getElementById('resultsTable').style.display = 'block';
+            });
+
+            // Mostrar as negativas
+            showNegatives();
+        }
+
+        function getGamesByFilter(stats, filterOption) {
+            switch (filterOption) {
+                case 'highScoring':
+                    return stats.highScoringGames;
+                case 'veryHighScoring':
+                    return stats.veryHighScoringGames;
+                case 'homeWins':
+                    return stats.homeWins;
+                case 'awayWins':
+                    return stats.awayWins;
+                case 'draw':
+                    return stats.draws;
+                default:
+                    return 0;
+            }
+        }
+
+        function relationMatches(results) {
+            results.sort((a, b) => {
+                return (b.participationPoints * b.points) - (a.participationPoints * a.points);
+            });
+        }
+
+        function sortByPercentage() {
+            const tbody = document.getElementById('resultsTable').querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            document.getElementById('btn-down').style.display = 'block';
+            document.getElementById('btn-up').style.display = 'none';
+
+            const results = rows.map(row => {
+                const cells = row.querySelectorAll('td');
+                const team = cells[0].innerText;
+                const points = parseInt(cells[1].innerText);
+                const totalGames = parseInt(cells[2].innerText);
+                const games = parseInt(cells[3].innerText);
+                const percentage = (games / totalGames) * 100;
+
+                return { team, points, totalGames, games, percentage, row };
+            });
+
+            results.sort((a, b) => b.percentage - a.percentage);
+
+            tbody.innerHTML = '';
+            results.forEach(result => {
+                tbody.appendChild(result.row);
+            });
+        }
+
+        function showNegatives() {
+            const tbody = document.getElementById('negativeBody');
+            tbody.innerHTML = '';
+
+            const results = Array.from(document.getElementById('resultsTable').querySelectorAll('tbody tr'));
+            const teams = results.slice(0, 5).map(row => row.cells[0].innerText);
+
+            teams.forEach(team => {
+                const teamResult = teamStats[team];
+                const gamesList = teamResult.gamesList.slice(0, 20); // Pegar os primeiros 20 jogos
+                const row = document.createElement('tr');
+
+                // Cabeçalho com o nome do time
+                const headerCell = document.createElement('th');
+                headerCell.textContent = team;
+                headerCell.colSpan = 20;
+                row.appendChild(headerCell);
+                tbody.appendChild(row);
+
+                // Linha com os resultados dos jogos
+                const gameRow = document.createElement('tr');
+                gamesList.forEach(game => {
+                    const totalGoals = game.totalGoals;
+                    const gameCell = document.createElement('td');
+                    gameCell.textContent = `${game.teams}: ${game.score}`;
+                    if (totalGoals < 2.5) {
+                        gameCell.classList.add('negative'); // Adicionar classe apenas se for uma negativa
+                    }
+                    gameRow.appendChild(gameCell);
+                });
+                tbody.appendChild(gameRow);
+            });
+
+            document.getElementById('negativeResults').style.display = 'table';
+        }
+
+        function clearData() {
+            document.getElementById('dataInput').value = "";
+            document.getElementById('resultsTable').style.display = 'none';
+            document.getElementById('negativeResults').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
