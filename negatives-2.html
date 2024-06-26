@@ -82,7 +82,8 @@
         placeholder="Insira os dados dos jogos para criação do rank..."></textarea>
     <br>
 
-    <button onclick="processData()">ANALISAR</button>
+    <button onclick="generateRanking()">GERAR RANKING</button>
+    <button onclick="generateRankingWithNegatives()">GERAR RANKING COM NEGATIVAS</button>
     <button onclick="clearData()">LIMPAR</button>
 
     <table id="matchTable" class="matchTable">
@@ -133,7 +134,15 @@
         var results = [];
         var sortOrder = 'default';
 
-        function processData() {
+        function generateRanking() {
+            processData(false);
+        }
+
+        function generateRankingWithNegatives() {
+            processData(true);
+        }
+
+        function processData(includeNegatives) {
             let data = document.getElementById('dataInput').value;
             let negativeData = document.getElementById('negativeInput').value;
             let filter = document.getElementById('filter').value;
@@ -237,8 +246,10 @@
             results.sort(defaultSort);
             displayResults(results);
 
-            createMatchTable(negativeMatches, 'matchTable', results.slice(0, 5).map(result => result.team));
-            validateTopTeams(results, negativeMatches);
+            if (includeNegatives) {
+                createMatchTable(negativeMatches, 'matchTable', results.slice(0, 5).map(result => result.team));
+                validateTopTeams(results, negativeMatches);
+            }
         }
 
         function getGamesByFilter(stats, filterOption) {
