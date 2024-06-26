@@ -51,12 +51,14 @@
             background-color: #dbdbdb;
         }
 
-        .gray {
-            background-color: #f2f2f2;
+        .matchTable {
+            display: block;
+            font-size: 10px;
         }
 
-        .negative {
-            background-color: #ffcccc;
+        .highlight {
+            border: 2px solid red;
+            color: red;
         }
     </style>
 </head>
@@ -72,10 +74,32 @@
         <option value="draw" data-weight="1">Empate</option>
     </select>
     <br><br>
-    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos aqui..."></textarea>
+    <textarea id="negativeInput" rows="10" cols="50"
+        placeholder="Insira os dados da linha operacional a validar as negativas..."></textarea>
     <br>
+    <br>
+    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para criação do rank..."></textarea>
+    <br>
+    
     <button onclick="processData()">ANALISAR</button>
     <button onclick="clearData()">LIMPAR</button>
+
+    <table id="matchTable" class="matchTable">
+        <tbody></tbody>
+    </table>
+    <br>
+    <br>
+
+    <table id="missingTeamsTable" class="matchTable">
+        <thead>
+            <tr>
+                <th>Times rankeados não encontrados na linha operacional.</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <br>
+    <br>
 
     <table id="resultsTable">
         <thead>
@@ -106,20 +130,12 @@
         <tbody></tbody>
     </table>
 
-    <table id="negativeResults" style="display: none;">
-        <thead>
-            <tr>
-                <th colspan="20">NEGATIVAS</th>
-            </tr>
-        </thead>
-        <tbody id="negativeBody"></tbody>
-    </table>
-
     <script>
-        let teamStats = {}; // Variável global para armazenar estatísticas dos times
+        var state = false;
 
         function processData() {
             let data = document.getElementById('dataInput').value;
+            let negativeData = document.getElementById('negativeInput').value;
             let filter = document.getElementById('filter').value;
             document.getElementById('btn-down').style.display = 'none';
             document.getElementById('btn-up').style.display = 'block';
@@ -128,23 +144,29 @@
                 case 'highScoring':
                     document.getElementById('filterExpose').innerText = 'OVER 3.5';
                     break;
+
                 case 'veryHighScoring':
                     document.getElementById('filterExpose').innerText = '5+';
                     break;
+
                 case 'homeWins':
                     document.getElementById('filterExpose').innerText = 'Casa Vence';
                     break;
+
                 case 'awayWins':
                     document.getElementById('filterExpose').innerText = 'Visitante Vence';
                     break;
+
                 case 'draw':
                     document.getElementById('filterExpose').innerText = 'Empate';
                     break;
             }
 
             data = data.replace(/['"]+/g, '');
+            negativeData = negativeData.replace(/['"]+/g, '');
 
             const games = data.trim().split(/\t|\n/);
+            const negativeGames = negativeData.trim().split(/\t|\n/);
 
             const matches = [];
             for (let i = 0; i < games.length; i += 2) {
@@ -153,22 +175,25 @@
                 matches.push({ teams, score });
             }
 
-            teamStats = {}; // Limpa os dados anteriores
+            const negativeMatches = [];
+            for (let i = 0; i < negativeGames.length; i += 2) {
+                const teams = negativeGames[i].trim();
+                const score = negativeGames[i + 1].trim();
+                negativeMatches.push({ teams, score });
+            }
+
+            const teamStats = {};
             matches.forEach(match => {
                 const [team1, team2] = match.teams.split(' x ');
                 const [score1, score2] = match.score.split('-').map(Number);
                 const totalGoals = score1 + score2;
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { gamesList: [], highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
+                    teamStats[team1] = { highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { gamesList: [], highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
+                    teamStats[team2] = { highScoringGames: 0, veryHighScoringGames: 0, homeWins: 0, awayWins: 0, draws: 0, totalGames: 0, points: 0 };
                 }
-
-                // Armazenar detalhes de cada jogo
-                teamStats[team1].gamesList.push({ teams: match.teams, score: match.score, totalGoals });
-                teamStats[team2].gamesList.push({ teams: match.teams, score: match.score, totalGoals });
 
                 teamStats[team1].totalGames++;
                 teamStats[team2].totalGames++;
@@ -210,13 +235,18 @@
                 results.push({ team, games, totalGames, points, participationPoints });
             });
 
-            // Ordenar apenas os resultados para o ranking (excluindo os primeiros 20 jogos)
-            const filteredResults = results.filter(result => result.team !== 'notInFive')
-                .slice(5);
+            results.sort((a, b) => {
+                const percentageA = a.games / a.totalGames;
+                const percentageB = b.games / b.totalGames;
 
-            relationMatches(filteredResults);
+                if (percentageB !== percentageA) {
+                    return percentageB - percentageA;
+                }
 
-            filteredResults.forEach(result => {
+                return (b.points * b.participationPoints) - (a.points * a.participationPoints);
+            });
+
+            results.forEach(result => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                   <td>${result.team}</td>
@@ -229,8 +259,8 @@
                 document.getElementById('resultsTable').style.display = 'block';
             });
 
-            // Mostrar as negativas
-            showNegatives();
+            createMatchTable(negativeMatches, 'matchTable', results.slice(0, 5).map(result => result.team));
+            validateTopTeams(results, negativeMatches);
         }
 
         function getGamesByFilter(stats, filterOption) {
@@ -250,77 +280,57 @@
             }
         }
 
-        function relationMatches(results) {
-            results.sort((a, b) => {
-                return (b.participationPoints * b.points) - (a.participationPoints * a.points);
-            });
-        }
-
-        function sortByPercentage() {
-            const tbody = document.getElementById('resultsTable').querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            document.getElementById('btn-down').style.display = 'block';
-            document.getElementById('btn-up').style.display = 'none';
-
-            const results = rows.map(row => {
-                const cells = row.querySelectorAll('td');
-                const team = cells[0].innerText;
-                const points = parseInt(cells[1].innerText);
-                const totalGames = parseInt(cells[2].innerText);
-                const games = parseInt(cells[3].innerText);
-                const percentage = (games / totalGames) * 100;
-
-                return { team, points, totalGames, games, percentage, row };
-            });
-
-            results.sort((a, b) => b.percentage - a.percentage);
-
-            tbody.innerHTML = '';
-            results.forEach(result => {
-                tbody.appendChild(result.row);
-            });
-        }
-
-        function showNegatives() {
-            const tbody = document.getElementById('negativeBody');
-            tbody.innerHTML = '';
-
-            const results = Array.from(document.getElementById('resultsTable').querySelectorAll('tbody tr'));
-            const teams = results.slice(0, 5).map(row => row.cells[0].innerText);
-
-            teams.forEach(team => {
-                const teamResult = teamStats[team];
-                const gamesList = teamResult.gamesList.slice(0, 20); // Pegar os primeiros 20 jogos
-                const row = document.createElement('tr');
-
-                // Cabeçalho com o nome do time
-                const headerCell = document.createElement('th');
-                headerCell.textContent = team;
-                headerCell.colSpan = 20;
-                row.appendChild(headerCell);
-                tbody.appendChild(row);
-
-                // Linha com os resultados dos jogos
-                const gameRow = document.createElement('tr');
-                gamesList.forEach(game => {
-                    const totalGoals = game.totalGoals;
-                    const gameCell = document.createElement('td');
-                    gameCell.textContent = `${game.teams}: ${game.score}`;
-                    if (totalGoals < 2.5) {
-                        gameCell.classList.add('negative'); // Adicionar classe apenas se for uma negativa
-                    }
-                    gameRow.appendChild(gameCell);
-                });
-                tbody.appendChild(gameRow);
-            });
-
-            document.getElementById('negativeResults').style.display = 'table';
-        }
-
         function clearData() {
             document.getElementById('dataInput').value = "";
+            document.getElementById('negativeInput').value = "";
             document.getElementById('resultsTable').style.display = 'none';
-            document.getElementById('negativeResults').style.display = 'none';
+            document.getElementById('matchTable').style.display = 'none';
+            document.getElementById('missingTeamsTable').style.display = 'none';
+        }
+
+        function createMatchTable(matches, tableId, topTeams) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            const row = document.createElement('tr');
+            matches.forEach(match => {
+                const cell = document.createElement('td');
+                cell.textContent = `${match.teams}\n${match.score}`;
+                const [team1, team2] = match.teams.split(' x ');
+                const [score1, score2] = match.score.split('-').map(Number);
+                const totalGoals = score1 + score2;
+
+                if ((topTeams.includes(team1) || topTeams.includes(team2)) && totalGoals < 3) {
+                    cell.classList.add('highlight');
+                }
+
+                row.appendChild(cell);
+            });
+            tbody.appendChild(row);
+            table.style.display = 'block';
+        }
+
+        function validateTopTeams(results, negativeMatches) {
+            const topTeams = results.slice(0, 5).map(result => result.team);
+            const matchTeams = new Set(negativeMatches.flatMap(match => match.teams.split(' x ')));
+
+            const missingTeams = topTeams.filter(team => !matchTeams.has(team));
+
+            const missingTbody = document.getElementById('missingTeamsTable').querySelector('tbody');
+            missingTbody.innerHTML = '';
+
+            missingTeams.forEach(team => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${team}</td>`;
+                missingTbody.appendChild(row);
+            });
+
+            if (missingTeams.length > 0) {
+                document.getElementById('missingTeamsTable').style.display = 'block';
+            } else {
+                document.getElementById('missingTeamsTable').style.display = 'none';
+            }
         }
     </script>
 </body>
