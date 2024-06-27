@@ -253,7 +253,7 @@
                 results.push({ team, games, totalGames, points, participationPoints });
             });
 
-            results.sort(defaultSort);
+            results.sort(customSort);
             displayResults(results);
 
             if (includeNegatives && negativeData !== '') {
@@ -348,15 +348,14 @@
             }
         }
 
-        function defaultSort(a, b) {
-            const pointsPerGameA = a.points / a.totalGames;
-            const pointsPerGameB = b.points / b.totalGames;
-
-            if (pointsPerGameB !== pointsPerGameA) {
-                return pointsPerGameB - pointsPerGameA;
+        function customSort(a, b) {
+            if (b.points !== a.points) {
+                return b.points - a.points;
             }
-
-            return b.participationPoints - a.participationPoints;
+            if (b.games !== a.games) {
+                return b.games - a.games;
+            }
+            return a.totalGames - b.totalGames;
         }
 
         function sortByPercentage() {
@@ -373,7 +372,7 @@
             if (state) {
                 sortByPercentage();
             } else {
-                results.sort(defaultSort);
+                results.sort(customSort);
             }
             displayResults(results);
         }
