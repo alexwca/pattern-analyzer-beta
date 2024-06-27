@@ -60,14 +60,6 @@
             border: 2px solid red;
             color: red;
         }
-
-        .negative-highlight {
-            background-color: lightcoral;
-        }
-
-        .positive-highlight {
-            background-color: lightgreen;
-        }
     </style>
 </head>
 
@@ -255,7 +247,7 @@
             displayResults(results);
 
             if (includeNegatives) {
-                createNegativeMatchTable(negativeMatches.slice(0, 20), 'matchTable', results.slice(0, 5).map(result => result.team));
+                createMatchTable(negativeMatches, 'matchTable', results.slice(0, 5).map(result => result.team));
                 validateTopTeams(results, negativeMatches);
             }
         }
@@ -285,41 +277,25 @@
             document.getElementById('missingTeamsTable').style.display = 'none';
         }
 
-        function createNegativeMatchTable(matches, tableId, topTeams) {
+        function createMatchTable(matches, tableId, topTeams) {
             const table = document.getElementById(tableId);
             const tbody = table.querySelector('tbody');
             tbody.innerHTML = '';
 
             const row = document.createElement('tr');
-            const topTeamsSet = new Set(topTeams);
-            const highlightedIndices = new Set();
-
-            matches.forEach((match, index) => {
-                const [team1, team2] = match.teams.split(' x ');
-                if (topTeamsSet.has(team1) || topTeamsSet.has(team2)) {
-                    for (let j = 0; j < 3; j++) {
-                        if (index + j < matches.length) {
-                            highlightedIndices.add(index + j);
-                        }
-                    }
-                }
-            });
-
-            matches.forEach((match, index) => {
+            matches.forEach(match => {
                 const cell = document.createElement('td');
                 cell.textContent = `${match.teams}\n${match.score}`;
-                if (highlightedIndices.has(index)) {
-                    const [score1, score2] = match.score.split('-').map(Number);
-                    const totalGoals = score1 + score2;
-                    if (totalGoals >= 2.5) {
-                        cell.classList.add('positive-highlight');
-                    } else {
-                        cell.classList.add('negative-highlight');
-                    }
+                const [team1, team2] = match.teams.split(' x ');
+                const [score1, score2] = match.score.split('-').map(Number);
+                const totalGoals = score1 + score2;
+
+                if ((topTeams.includes(team1) || topTeams.includes(team2)) && totalGoals < 3) {
+                    cell.classList.add('highlight');
                 }
+
                 row.appendChild(cell);
             });
-
             tbody.appendChild(row);
             table.style.display = 'block';
         }
