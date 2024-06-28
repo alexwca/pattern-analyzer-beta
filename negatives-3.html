@@ -319,7 +319,7 @@
             matches.forEach(match => {
                 const cell = document.createElement('td');
                 cell.textContent = `${match.teams}\n${match.score}`;
-
+                
                 const [team1, team2] = match.teams.split(' x ');
                 const [score1, score2] = match.score.split('-').map(Number);
                 const totalGoals = score1 + score2;
