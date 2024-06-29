@@ -1,0 +1,90 @@
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid rgb(158, 158, 158);
+    padding: 8px;
+    text-align: left;
+    color: rgb(52, 52, 52);
+}
+
+textarea {
+    resize: none;
+    min-width: 400px;
+    height: 200px;
+}
+
+#filterExpose {
+    text-transform: uppercase;
+}
+
+#filter {
+    padding: 5px 10px;
+}
+
+button {
+    margin: 10px 0;
+    padding: 5px 10px;
+}
+
+table {
+    display: none;
+}
+
+table tr:nth-child(even) {
+    background-color: #dbdbdb;
+}
+
+.matchTable {
+    display: block;
+    font-size: 10px;
+}
+
+.highlight {
+    border: 2px solid red;
+    color: red;
+}
+
+.negative-highlight {
+    background-color: lightcoral;
+}
+
+.positive-highlight {
+    background-color: lightgreen;
+}
+
+.top5 {
+    background-color: yellow;
+}
+
+.top5-vs-top5 {
+    background-color: #36c;
+    color: white;
+}
+
+.light-green {
+    background-color: lightgreen;
+}
+
+.light-red {
+    background-color: lightcoral;
+}
+
+.light-blue {
+    background-color: #add8e6;
+}
+
+#maximasTable {
+    margin-top: 20px;
+}
+
+#maximasTable th, #maximasTable td {
+    text-align: center;
+}
