@@ -37,17 +37,17 @@ function generateMaximasDeTimes() {
         if (score1 > score2) {
             // Team 1 wins, reset its current streak
             teamStats[team1].sinceLastWin = 0;
+            teamStats[team2].sinceLastWin++;
             if (teamStats[team2].sinceLastWin > teamStats[team2].maxNoWinsStreak) {
                 teamStats[team2].maxNoWinsStreak = teamStats[team2].sinceLastWin;
             }
-            teamStats[team2].sinceLastWin++;
         } else if (score2 > score1) {
             // Team 2 wins, reset its current streak
             teamStats[team2].sinceLastWin = 0;
+            teamStats[team1].sinceLastWin++;
             if (teamStats[team1].sinceLastWin > teamStats[team1].maxNoWinsStreak) {
                 teamStats[team1].maxNoWinsStreak = teamStats[team1].sinceLastWin;
             }
-            teamStats[team1].sinceLastWin++;
         } else {
             // Draw, update both teams' streaks
             teamStats[team1].sinceLastWin++;
