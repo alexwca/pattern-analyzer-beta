@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Máximas de Times</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="ranking.html">Ranking</a></li>
+            <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
+            <li><a href="maximas.html">Máximas</a></li>
+        </ul>
+    </nav>
+    <h1>Máximas de Times</h1>
+    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
+    <br>
+    <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
+    <table id="maximasTable">
+        <thead>
+            <tr>
+                <th>TIME</th>
+                <th>MÁXIMA ATUAL</th>
+                <th>MAIOR MÁXIMA</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script src="scripts/maximas.js"></script>
+</body>
+
+</html>

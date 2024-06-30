@@ -21,6 +21,19 @@ textarea {
     height: 200px;
 }
 
+ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+    padding: 20px 15px;
+}
+
+li a {
+    color: #333;
+    text-decoration: none;
+}
+
+
 #filterExpose {
     text-transform: uppercase;
 }
@@ -35,15 +48,18 @@ button {
 }
 
 table {
-    display: none;
+    margin: 20px 0;
 }
 
 table tr:nth-child(even) {
     background-color: #dbdbdb;
 }
 
+#matchTable, #missingTeamsTable, #resultsTable, #maximasTable {
+    display: none;
+}
+
 .matchTable {
-    display: block;
     font-size: 10px;
 }
 

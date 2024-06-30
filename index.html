@@ -1,84 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>ANÁLISE DE RANKING</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <h1>ANÁLISE DE RANKING</h1>
-    <label for="filter">Escolha o filtro de análise:</label>
-    <select id="filter">
-        <option value="highScoring" data-weight="2">OVER 3.5</option>
-        <option value="veryHighScoring" data-weight="3">5+</option>
-        <option value="homeWins" data-weight="1">Casa vence</option>
-        <option value="awayWins" data-weight="1">Visitante vence</option>
-        <option value="draw" data-weight="1">Empate</option>
-    </select>
-    <br><br>
-    <textarea id="negativeInput" rows="10" cols="50"
-        placeholder="Insira os dados da linha operacional a validar as negativas..."></textarea>
-    <br><br>
-    <textarea id="dataInput" rows="10" cols="50"
-        placeholder="Insira os dados dos jogos para criação do rank..."></textarea>
-    <br>
-    <button onclick="generateRanking()">GERAR RANKING</button>
-    <button onclick="generateRankingWithNegatives()">GERAR RANKING COM NEGATIVAS</button>
-    <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
-    <button onclick="clearData()">LIMPAR</button>
-    <table id="matchTable" class="matchTable">
-        <tbody></tbody>
-    </table>
-    <br><br>
-    <table id="missingTeamsTable" class="matchTable">
-        <thead>
-            <tr>
-                <th>Times rankeados não encontrados na linha operacional.</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <br><br>
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>TIME</th>
-                <th>PONTOS</th>
-                <th>PARTIDAS JOGADAS</th>
-                <th>JOGOS <span id="filterExpose"></span></th>
-                <th>% &nbsp;
-                    <button id="btn-sort" onclick="toggleSortByPercentage()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-chevron-up" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-chevron-down" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                        </svg>
-                    </button>
-                </th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <table id="maximasTable">
-        <thead>
-            <tr>
-                <th>TIME</th>
-                <th>MÁXIMA ATUAL</th>
-                <th>MAIOR MÁXIMA</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <script src="js/script.js"></script>
+    <nav>
+        <ul>
+            <li><a href="ranking.html">Ranking</a></li>
+            <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
+            <li><a href="maximas.html">Máximas de Times</a></li>
+        </ul>
+    </nav>
 </body>
-
 </html>
