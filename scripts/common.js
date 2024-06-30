@@ -1,5 +1,6 @@
 function clearData() {
     document.getElementById('dataInput').value = "";
+
     if (document.getElementById('negativeInput')) {
         document.getElementById('negativeInput').value = "";
     }
@@ -9,5 +10,8 @@ function clearData() {
     }
     if (document.getElementById('missingTeamsTable')) {
         document.getElementById('missingTeamsTable').style.display = 'none';
+    }
+    if (document.getElementById('maximasTable')) {
+        document.getElementById('maximasTable').style.display = 'none';
     }
 }
