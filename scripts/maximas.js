@@ -1,12 +1,21 @@
 function generateMaximasDeTimes() {
-    const data = document.getElementById('dataInput').value.replace(/['"]+/g, '');
-    const games = data.trim().split(/\t|\n/);
+    const data = document.getElementById('dataInput').value.replace(/['"]+/g, '').replace(/\+/g, '').trim();
+    if (!data) {
+        alert("Por favor, insira os dados dos jogos.");
+        return;
+    }
+
+    const games = data.split(/\t|\n/).filter(line => line.trim() !== '');
 
     const matches = [];
     for (let i = 0; i < games.length; i += 2) {
-        const teams = games[i].trim();
-        const score = games[i + 1].trim();
-        matches.push({ teams, score });
+        if (i + 1 < games.length) {
+            const teams = games[i].trim();
+            const score = games[i + 1].trim();
+            if (teams && score) {
+                matches.push({ teams, score });
+            }
+        }
     }
 
     // Invertendo a ordem dos jogos para análise de trás para frente
@@ -15,7 +24,7 @@ function generateMaximasDeTimes() {
     const teamStats = {};
 
     matches.forEach(match => {
-        const [team1, team2] = match.teams.split(' x ');
+        const [team1, team2] = match.teams.split(' x ').map(team => team.trim());
         const [score1, score2] = match.score.split('-').map(Number);
 
         if (!teamStats[team1]) {
@@ -28,19 +37,17 @@ function generateMaximasDeTimes() {
         if (score1 > score2) {
             // Team 1 wins, reset its current streak
             teamStats[team1].sinceLastWin = 0;
-            // Update Team 2
-            teamStats[team2].sinceLastWin++;
             if (teamStats[team2].sinceLastWin > teamStats[team2].maxNoWinsStreak) {
                 teamStats[team2].maxNoWinsStreak = teamStats[team2].sinceLastWin;
             }
+            teamStats[team2].sinceLastWin++;
         } else if (score2 > score1) {
             // Team 2 wins, reset its current streak
             teamStats[team2].sinceLastWin = 0;
-            // Update Team 1
-            teamStats[team1].sinceLastWin++;
             if (teamStats[team1].sinceLastWin > teamStats[team1].maxNoWinsStreak) {
                 teamStats[team1].maxNoWinsStreak = teamStats[team1].sinceLastWin;
             }
+            teamStats[team1].sinceLastWin++;
         } else {
             // Draw, update both teams' streaks
             teamStats[team1].sinceLastWin++;

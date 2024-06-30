@@ -7,54 +7,45 @@ function generateRankingWithNegatives() {
 }
 
 function processDataWithNegatives() {
-    let data = document.getElementById('dataInput').value;
-    let negativeData = document.getElementById('negativeInput').value;
-    let filter = document.getElementById('filter').value;
-    document.getElementById('btn-sort').style.display = 'block';
-
-    switch (filter) {
-        case 'highScoring':
-            document.getElementById('filterExpose').innerText = 'OVER 3.5';
-            break;
-        case 'veryHighScoring':
-            document.getElementById('filterExpose').innerText = '5+';
-            break;
-        case 'homeWins':
-            document.getElementById('filterExpose').innerText = 'Casa Vence';
-            break;
-        case 'awayWins':
-            document.getElementById('filterExpose').innerText = 'Visitante Vence';
-            break;
-        case 'draw':
-            document.getElementById('filterExpose').innerText = 'Empate';
-            break;
+    let data = document.getElementById('dataInput').value.replace(/['"]+/g, '').replace(/\+/g, '').trim();
+    if (!data) {
+        alert("Por favor, insira os dados dos jogos.");
+        return;
     }
 
-    data = data.replace(/['"]+/g, '');
-    negativeData = negativeData.replace(/['"]+/g, '');
+    let negativeData = document.getElementById('negativeInput').value.replace(/['"]+/g, '').replace(/\+/g, '').trim();
 
-    const games = data.trim().split(/\t|\n/);
-    const negativeGames = negativeData.trim().split(/\t|\n/);
+    const games = data.split(/\t|\n/).filter(line => line.trim() !== '');
+    const negativeGames = negativeData.split(/\t|\n/).filter(line => line.trim() !== '');
 
     const matches = [];
     for (let i = 0; i < games.length; i += 2) {
-        const teams = games[i].trim();
-        const score = games[i + 1].trim();
-        matches.push({ teams, score });
+        if (i + 1 < games.length) {
+            const teams = games[i].trim();
+            const score = games[i + 1].trim();
+            if (teams && score) {
+                matches.push({ teams, score });
+            }
+        }
     }
 
     const negativeMatches = [];
     if (negativeData !== '') {
         for (let i = 0; i < negativeGames.length; i += 2) {
-            const teams = negativeGames[i].trim();
-            const score = negativeGames[i + 1].trim();
-            negativeMatches.push({ teams, score });
+            if (i + 1 < negativeGames.length) {
+                const teams = negativeGames[i].trim();
+                const score = negativeGames[i + 1].trim();
+                if (teams && score) {
+                    negativeMatches.push({ teams, score });
+                }
+            }
         }
     }
 
     const teamStats = {};
+
     matches.forEach(match => {
-        const [team1, team2] = match.teams.split(' x ');
+        const [team1, team2] = match.teams.split(' x ').map(team => team.trim());
         const [score1, score2] = match.score.split('-').map(Number);
         const totalGoals = score1 + score2;
 
@@ -161,7 +152,7 @@ function createNegativeMatchTable(matches, tableId, topTeams) {
     });
 
     tbody.appendChild(row);
-    document.getElementById('matchTable').style.display = 'block';
+    table.style.display = 'block';
 }
 
 function validateTopTeams(results, negativeMatches) {
