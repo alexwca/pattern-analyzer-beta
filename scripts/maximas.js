@@ -1,206 +1,173 @@
-let maximasSortOrder = {
-    team: 'asc',
-    currentWithoutWin: 'desc',
-    maxNoWinsStreak: 'asc'
-};
+function sanitizeData(data) {
+    return data.replace(/\+/g, '').trim();
+}
 
-let statsSortOrder = {
-    wins: 'asc',
-    draws: 'asc'
-};
+function createGameArray(data) {
+    // Sanitizar os dados
+    const sanitizedData = sanitizeData(data);
 
-function generateMaximasDeTimes() {
-    const data = document.getElementById('dataInput').value.replace(/['"]+/g, '').replace(/\+/g, '').trim();
-    if (!data) {
-        alert("Por favor, insira os dados dos jogos.");
-        return;
+    // Usar regex para encontrar todas as ocorrências entre aspas
+    const regex = /"([^"]+)"/g;
+    const games = [];
+    let match;
+
+    while ((match = regex.exec(sanitizedData)) !== null) {
+        games.push(match[1].trim());
     }
 
-    const games = data.split(/\t|\n/).filter(line => line.trim() !== '');
+    return games;
+}
 
-    const matches = [];
-    for (let i = 0; i < games.length; i += 2) {
-        if (i + 1 < games.length) {
-            const teams = games[i].trim();
-            const score = games[i + 1].trim();
-            if (teams && score) {
-                matches.push({ teams, score });
-            }
-        }
-    }
+function organizeGamesInColumns(games, columns) {
+    const rows = Math.ceil(games.length / columns);
+    const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
 
-    // Invertendo a ordem dos jogos para análise de trás para frente
-    matches.reverse();
+    games.forEach((game, index) => {
+        const row = Math.floor(index / columns);
+        const col = index % columns;
+        gameArray[row][col] = game;
+    });
 
+    return gameArray;
+}
+
+function invertGameArray(gameArray) {
+    return gameArray.reverse();
+}
+
+function calculateMaximas(gameArray) {
     const teamStats = {};
 
-    matches.forEach(match => {
-        const [team1, team2] = match.teams.split(' x ').map(team => team.trim());
-        const [score1, score2] = match.score.split('-').map(Number);
+    gameArray.forEach(row => {
+        row.forEach(game => {
+            if (game) {
+                const [teams, score] = game.split(' ').join(' ').split(/\s(?=\d)/);
+                const [team1, team2] = teams.split(' x ');
+                const [score1, score2] = score.split('-').map(Number);
 
-        if (!teamStats[team1]) {
-            teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
-        }
-        if (!teamStats[team2]) {
-            teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
-        }
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
+                }
 
-        if (score1 > score2) {
-            // Team 1 wins, reset its current streak
-            teamStats[team1].currentWithoutWin = 0;
-            teamStats[team1].wins++;
+                if (score1 > score2) {
+                    // Team 1 wins, reset its current streak
+                    teamStats[team1].currentWithoutWin = 0;
+                    teamStats[team1].wins++;
 
-            // Update Team 2
-            teamStats[team2].currentWithoutWin++;
-            if (teamStats[team2].currentWithoutWin > teamStats[team2].maxNoWinsStreak) {
-                teamStats[team2].maxNoWinsStreak = teamStats[team2].currentWithoutWin;
-            }
-        } else if (score2 > score1) {
-            // Team 2 wins, reset its current streak
-            teamStats[team2].currentWithoutWin = 0;
-            teamStats[team2].wins++;
+                    // Update Team 2
+                    teamStats[team2].currentWithoutWin++;
+                    if (teamStats[team2].currentWithoutWin > teamStats[team2].maxNoWinsStreak) {
+                        teamStats[team2].maxNoWinsStreak = teamStats[team2].currentWithoutWin;
+                    }
+                } else if (score2 > score1) {
+                    // Team 2 wins, reset its current streak
+                    teamStats[team2].currentWithoutWin = 0;
+                    teamStats[team2].wins++;
 
-            // Update Team 1
-            teamStats[team1].currentWithoutWin++;
-            if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
-                teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
+                    // Update Team 1
+                    teamStats[team1].currentWithoutWin++;
+                    if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
+                        teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
+                    }
+                } else {
+                    // Draw, update both teams' streaks
+                    teamStats[team1].currentWithoutWin++;
+                    teamStats[team2].currentWithoutWin++;
+                    teamStats[team1].draws++;
+                    teamStats[team2].draws++;
+                    if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
+                        teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
+                    }
+                    if (teamStats[team2].currentWithoutWin > teamStats[team2].maxNoWinsStreak) {
+                        teamStats[team2].maxNoWinsStreak = teamStats[team2].currentWithoutWin;
+                    }
+                }
             }
-        } else {
-            // Draw, update both teams' streaks
-            teamStats[team1].currentWithoutWin++;
-            teamStats[team2].currentWithoutWin++;
-            teamStats[team1].draws++;
-            teamStats[team2].draws++;
-            if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
-                teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
-            }
-            if (teamStats[team2].currentWithoutWin > teamStats[team2].maxNoWinsStreak) {
-                teamStats[team2].maxNoWinsStreak = teamStats[team2].currentWithoutWin;
-            }
-        }
+        });
     });
 
-    // Transformar os dados do objeto em arrays para ordenação
-    const teamStatsArray = Object.keys(teamStats).map(team => ({
-        team,
-        currentWithoutWin: teamStats[team].currentWithoutWin,
-        maxNoWinsStreak: teamStats[team].maxNoWinsStreak,
-        wins: teamStats[team].wins,
-        draws: teamStats[team].draws
-    }));
-
-    // Ordenar pela coluna "currentWithoutWin" em ordem decrescente por padrão
-    teamStatsArray.sort((a, b) => b.currentWithoutWin - a.currentWithoutWin);
-
-    const maximasTable = document.getElementById('maximasTable');
-    const statsTable = document.getElementById('statsTable');
-
-    const maximasTbody = maximasTable.querySelector('tbody');
-    const statsTbody = statsTable.querySelector('tbody');
-
-    maximasTbody.innerHTML = '';
-    statsTbody.innerHTML = '';
-
-    teamStatsArray.forEach(teamStat => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${teamStat.team}</td>
-            <td>${teamStat.currentWithoutWin}</td>
-            <td>${teamStat.maxNoWinsStreak}</td>
-        `;
-        maximasTbody.appendChild(row);
-    });
-
-    teamStatsArray.forEach(teamStat => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${teamStat.team}</td>
-            <td>${teamStat.wins}</td>
-            <td>${teamStat.draws}</td>
-        `;
-        statsTbody.appendChild(row);
-    });
-
-    maximasTable.style.display = 'block';
-    statsTable.style.display = 'block';
+    return teamStats;
 }
 
-function sortMaximasTable(criteria) {
-    const maximasTable = document.getElementById('maximasTable');
-    const maximasTbody = maximasTable.querySelector('tbody');
-    const rows = Array.from(maximasTbody.querySelectorAll('tr'));
+// Função para exibir as máximas no navegador
+function displayMaximas(teamStats) {
+    const maximasTableBody = document.getElementById('maximasTable').querySelector('tbody');
+    const statsTableBody = document.getElementById('statsTable').querySelector('tbody');
+
+    maximasTableBody.innerHTML = ''; // Limpar o corpo da tabela de máximas
+    statsTableBody.innerHTML = ''; // Limpar o corpo da tabela de estatísticas
+
+    // Ordenar por currentWithoutWin de forma decrescente inicialmente
+    const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentWithoutWin - a.currentWithoutWin);
+
+    sortedTeamStats.forEach(([team, stats]) => {
+        // Adicionar à tabela de máximas
+        const maximasRow = document.createElement('tr');
+        maximasRow.innerHTML = `
+            <td>${team}</td>
+            <td>${stats.currentWithoutWin}</td>
+            <td>${stats.maxNoWinsStreak}</td>
+        `;
+        maximasTableBody.appendChild(maximasRow);
+
+        // Adicionar à tabela de estatísticas
+        const statsRow = document.createElement('tr');
+        statsRow.innerHTML = `
+            <td>${team}</td>
+            <td>${stats.wins}</td>
+            <td>${stats.draws}</td>
+        `;
+        statsTableBody.appendChild(statsRow);
+    });
+
+    document.getElementById('maximasTable').style.display = 'block';
+    document.getElementById('statsTable').style.display = 'block';
+}
+
+function sortTable(tableId, column, order) {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
 
     let sortedRows;
-    if (criteria === 'team') {
+    if (column === 0) {
         sortedRows = rows.sort((a, b) => a.children[0].textContent.localeCompare(b.children[0].textContent));
-        if (maximasSortOrder[criteria] === 'desc') {
-            sortedRows.reverse();
-            maximasSortOrder[criteria] = 'asc';
-        } else {
-            maximasSortOrder[criteria] = 'desc';
-        }
-    } else if (criteria === 'currentWithoutWin') {
+    } else {
         sortedRows = rows.sort((a, b) => {
-            const aValue = parseInt(a.children[1].textContent);
-            const bValue = parseInt(b.children[1].textContent);
+            const aValue = parseInt(a.children[column].textContent);
+            const bValue = parseInt(b.children[column].textContent);
             return aValue - bValue;
         });
-        if (maximasSortOrder[criteria] === 'desc') {
-            sortedRows.reverse();
-            maximasSortOrder[criteria] = 'asc';
-        } else {
-            maximasSortOrder[criteria] = 'desc';
-        }
-    } else if (criteria === 'maxNoWinsStreak') {
-        sortedRows = rows.sort((a, b) => {
-            const aValue = parseInt(a.children[2].textContent);
-            const bValue = parseInt(b.children[2].textContent);
-            return aValue - bValue;
-        });
-        if (maximasSortOrder[criteria] === 'desc') {
-            sortedRows.reverse();
-            maximasSortOrder[criteria] = 'asc';
-        } else {
-            maximasSortOrder[criteria] = 'desc';
-        }
     }
 
-    maximasTbody.innerHTML = '';
-    sortedRows.forEach(row => maximasTbody.appendChild(row));
+    if (order === 'desc') {
+        sortedRows.reverse();
+    }
+
+    tbody.innerHTML = '';
+    sortedRows.forEach(row => tbody.appendChild(row));
 }
 
-function sortStatsTable(criteria) {
-    const statsTable = document.getElementById('statsTable');
-    const statsTbody = statsTable.querySelector('tbody');
-    const rows = Array.from(statsTbody.querySelectorAll('tr'));
+function toggleSort(tableId, column) {
+    const table = document.getElementById(tableId);
+    const header = table.querySelectorAll('th')[column].querySelector('button');
+    const currentOrder = header.dataset.order;
 
-    let sortedRows;
-    if (criteria === 'wins') {
-        sortedRows = rows.sort((a, b) => {
-            const aValue = parseInt(a.children[1].textContent);
-            const bValue = parseInt(b.children[1].textContent);
-            return aValue - bValue;
-        });
-        if (statsSortOrder[criteria] === 'asc') {
-            sortedRows.reverse();
-            statsSortOrder[criteria] = 'desc';
-        } else {
-            statsSortOrder[criteria] = 'asc';
-        }
-    } else if (criteria === 'draws') {
-        sortedRows = rows.sort((a, b) => {
-            const aValue = parseInt(a.children[2].textContent);
-            const bValue = parseInt(b.children[2].textContent);
-            return aValue - bValue;
-        });
-        if (statsSortOrder[criteria] === 'asc') {
-            sortedRows.reverse();
-            statsSortOrder[criteria] = 'desc';
-        } else {
-            statsSortOrder[criteria] = 'asc';
-        }
-    }
+    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    header.dataset.order = newOrder;
 
-    statsTbody.innerHTML = '';
-    sortedRows.forEach(row => statsTbody.appendChild(row));
+    sortTable(tableId, column, newOrder);
+}
+
+// Função principal para ser chamada no clique do botão
+function generateMaximasDeTimes() {
+    const data = document.getElementById('dataInput').value;
+    const games = createGameArray(data);
+    const gameArray = organizeGamesInColumns(games, 20);
+    const invertedGameArray = invertGameArray(gameArray);
+    const teamStats = calculateMaximas(invertedGameArray);
+    displayMaximas(teamStats);
 }

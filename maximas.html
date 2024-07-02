@@ -21,15 +21,16 @@
     <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
     <br>
     <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
-    <button onclick="clearData()">LIMPAR</button>
+
+    <div id="gameContainer"></div>
 
     <div style="display: flex; gap: 20px; justify-content: space-around;">
         <table id="maximasTable" style="display: none;">
             <thead>
                 <tr>
-                    <th>Time </th>
+                    <th>Time</th>
                     <th>
-                        <button onclick="sortMaximasTable('currentWithoutWin')">
+                        <button onclick="toggleSort('maximasTable', 1)" data-order="asc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -45,8 +46,9 @@
                         Máxima atual
                     </th>
                     <th>
-                        <button onclick="sortMaximasTable('maxNoWinsStreak')"><svg xmlns="http://www.w3.org/2000/svg"
-                                width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                        <button onclick="toggleSort('maximasTable', 2)" data-order="asc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
                                     d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
                             </svg>
@@ -69,7 +71,7 @@
                 <tr>
                     <th>Time</th>
                     <th>
-                        <button onclick="sortStatsTable('wins')">
+                        <button onclick="toggleSort('statsTable', 1)" data-order="asc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -85,7 +87,7 @@
                         Vitórias
                     </th>
                     <th>
-                        <button onclick="sortStatsTable('draws')">
+                        <button onclick="toggleSort('statsTable', 2)" data-order="asc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
