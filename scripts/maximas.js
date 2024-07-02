@@ -3,10 +3,7 @@ function sanitizeData(data) {
 }
 
 function createGameArray(data) {
-    // Sanitizar os dados
     const sanitizedData = sanitizeData(data);
-
-    // Usar regex para encontrar todas as ocorrências entre aspas
     const regex = /"([^"]+)"/g;
     const games = [];
     let match;
@@ -153,11 +150,12 @@ function sortTable(tableId, column, order) {
 
 function toggleSort(tableId, column) {
     const table = document.getElementById(tableId);
-    const header = table.querySelectorAll('th')[column].querySelector('button');
-    const currentOrder = header.dataset.order;
+    const headers = Array.from(table.querySelectorAll('th button'));
+    const currentOrder = headers[column].dataset.order;
 
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    header.dataset.order = newOrder;
+    headers.forEach(header => header.dataset.order = 'asc');
+    headers[column].dataset.order = newOrder;
 
     sortTable(tableId, column, newOrder);
 }

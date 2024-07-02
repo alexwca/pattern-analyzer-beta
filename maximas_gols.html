@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Máximas de Times</title>
+    <title>Máximas de Gols</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -14,23 +14,24 @@
         <ul>
             <li><a href="ranking.html">Ranking</a></li>
             <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
-            <li><a href="maximas.html">Máximas de vitórias</a></li>
+            <li><a href="maximas.html">Máximas</a></li>
             <li><a href="maximas_gols.html">Máximas de Gols</a></li>
         </ul>
     </nav>
-    <h1>Máximas de Times</h1>
+    <h1>Máximas de Gols</h1>
     <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
     <br>
-    <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
-    <button onclick="clearData()">LIMPAR</button>
+    <button onclick="generateMaximasDeGols()">GERAR MÁXIMAS DE GOLS</button>
+
+    <div id="gameContainer"></div>
 
     <div style="display: flex; gap: 20px; justify-content: space-around;">
-        <table id="maximasTable" style="display: none;">
+        <table id="maximasGolsTable_2_5" style="display: none;">
             <thead>
                 <tr>
                     <th>Time</th>
                     <th>
-                        <button onclick="toggleSort('maximasTable', 1)" data-order="asc">
+                        <button onclick="toggleSort('maximasGolsTable_2_5', 1)" data-order="desc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -39,14 +40,13 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
-                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
-                                </path>
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
                             </svg>
                         </button>
-                        Máxima atual
+                        Atual < 2.5
                     </th>
                     <th>
-                        <button onclick="toggleSort('maximasTable', 2)" data-order="asc">
+                        <button onclick="toggleSort('maximasGolsTable_2_5', 2)" data-order="desc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -55,23 +55,21 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
-                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
-                                </path>
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
                             </svg>
                         </button>
-                        Maior Máxima
+                        Máxima < 2.5
                     </th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-
-        <table id="statsTable" style="display: none;">
+        <table id="maximasGolsTable_3_5" style="display: none;">
             <thead>
                 <tr>
                     <th>Time</th>
                     <th>
-                        <button onclick="toggleSort('statsTable', 1)" data-order="asc">
+                        <button onclick="toggleSort('maximasGolsTable_3_5', 1)" data-order="desc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -80,14 +78,13 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
-                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
-                                </path>
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
                             </svg>
                         </button>
-                        Vitórias
+                        Atual < 3.5
                     </th>
                     <th>
-                        <button onclick="toggleSort('statsTable', 2)" data-order="asc">
+                        <button onclick="toggleSort('maximasGolsTable_3_5', 2)" data-order="desc">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-up" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
@@ -96,19 +93,55 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
-                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
-                                </path>
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
                             </svg>
                         </button>
-                        Empates
+                        Máxima < 3.5
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <table id="maximasGolsTable_5" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>
+                        <button onclick="toggleSort('maximasGolsTable_5', 1)" data-order="desc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </button>
+                        Atual < 5
+                    </th>
+                    <th>
+                        <button onclick="toggleSort('maximasGolsTable_5', 2)" data-order="desc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"></path>
+                            </svg>
+                        </button>
+                        Máxima < 5
                     </th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
-    <script src="scripts/maximas.js"></script>
-    <script src="scripts/common.js"></script>
+    <script src="scripts/maximas_gols.js"></script>
 </body>
 
 </html>
