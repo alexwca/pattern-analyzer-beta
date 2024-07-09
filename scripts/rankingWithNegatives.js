@@ -211,10 +211,10 @@ function displayResults(results) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${result.team}</td>
-            <td>${result.points}</td>
-            <td>${result.totalGames}</td>
-            <td>${result.games}</td>
-            <td>${(result.games / result.totalGames * 100).toFixed(2)}</td>
+            <td style="text-align: center">${result.points}</td>
+            <td style="text-align: center">${result.totalGames}</td>
+            <td style="text-align: center">${result.games}</td>
+            <td style="text-align: center">${(result.games / result.totalGames * 100).toFixed(2)}</td>
         `;
         tbody.appendChild(row);
         document.getElementById('resultsTable').style.display = 'block';

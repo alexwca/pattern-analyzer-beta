@@ -130,11 +130,11 @@ function displayMaximasGols(teamStats) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentUnder2_5}</td>
-            <td>${stats.maxUnder2_5}</td>
-            <td>${stats.gamesPlayed}</td>
-            <td>${stats.under2_5Total}</td>
-            <td>${stats.over2_5Total}</td>
+            <td style="text-align: center">${stats.currentUnder2_5}</td>
+            <td style="text-align: center">${stats.maxUnder2_5}</td>
+            <td style="text-align: center">${stats.gamesPlayed}</td>
+            <td style="text-align: center">${stats.under2_5Total} - <small>${(100 * (stats.under2_5Total / stats.gamesPlayed)).toFixed(2)}%</small></td>
+            <td style="text-align: center">${stats.over2_5Total} - <small>${(100 * (stats.over2_5Total / stats.gamesPlayed)).toFixed(2)}%</small></td>
         `;
         maximasGolsTableBody_2_5.appendChild(row);
     });
@@ -143,8 +143,8 @@ function displayMaximasGols(teamStats) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentUnder3_5}</td>
-            <td>${stats.maxUnder3_5}</td>
+            <td style="text-align: center">${stats.currentUnder3_5}</td>
+            <td style="text-align: center">${stats.maxUnder3_5}</td>
         `;
         maximasGolsTableBody_3_5.appendChild(row);
     });
@@ -153,8 +153,8 @@ function displayMaximasGols(teamStats) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentUnder5}</td>
-            <td>${stats.maxUnder5}</td>
+            <td style="text-align: center">${stats.currentUnder5}</td>
+            <td style="text-align: center">${stats.maxUnder5}</td>
         `;
         maximasGolsTableBody_5.appendChild(row);
     });

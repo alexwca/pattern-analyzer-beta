@@ -104,3 +104,16 @@ table tr:nth-child(even) {
 #maximasTable th, #maximasTable td {
     text-align: center;
 }
+
+#gameContainer {
+    display: flex;
+    gap: 10px;
+}
+
+#maximasGolsTable_2_5{
+    min-width: 50%;
+}
+
+#maximasGolsTable_3_5, #maximasGolsTable_5 {
+    flex-grow: 1
+}

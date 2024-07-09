@@ -105,8 +105,8 @@ function displayMaximas(teamStats) {
         const maximasRow = document.createElement('tr');
         maximasRow.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentWithoutWin}</td>
-            <td>${stats.maxNoWinsStreak}</td>
+            <td style="text-align: center">${stats.currentWithoutWin}</td>
+            <td style="text-align: center">${stats.maxNoWinsStreak}</td>
         `;
         maximasTableBody.appendChild(maximasRow);
 
@@ -114,8 +114,8 @@ function displayMaximas(teamStats) {
         const statsRow = document.createElement('tr');
         statsRow.innerHTML = `
             <td>${team}</td>
-            <td>${stats.wins}</td>
-            <td>${stats.draws}</td>
+            <td style="text-align: center">${stats.wins}</td>
+            <td style="text-align: center">${stats.draws}</td>
         `;
         statsTableBody.appendChild(statsRow);
     });
