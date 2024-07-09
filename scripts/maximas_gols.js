@@ -52,7 +52,8 @@ function calculateMaximasGols(gameArray) {
                         currentUnder5: 0, 
                         maxUnder5: 0, 
                         gamesPlayed: 0, 
-                        under2_5Total: 0 
+                        under2_5Total: 0,
+                        over2_5Total: 0 
                     };
                 }
                 if (!teamStats[team2]) {
@@ -64,7 +65,8 @@ function calculateMaximasGols(gameArray) {
                         currentUnder5: 0, 
                         maxUnder5: 0, 
                         gamesPlayed: 0, 
-                        under2_5Total: 0 
+                        under2_5Total: 0,
+                        over2_5Total: 0 
                     };
                 }
 
@@ -81,6 +83,8 @@ function calculateMaximasGols(gameArray) {
                 } else {
                     teamStats[team1].currentUnder2_5 = 0;
                     teamStats[team2].currentUnder2_5 = 0;
+                    teamStats[team1].over2_5Total++;
+                    teamStats[team2].over2_5Total++;
                 }
 
                 if (totalGols < 3.5) {
@@ -130,6 +134,7 @@ function displayMaximasGols(teamStats) {
             <td>${stats.maxUnder2_5}</td>
             <td>${stats.gamesPlayed}</td>
             <td>${stats.under2_5Total}</td>
+            <td>${stats.over2_5Total}</td>
         `;
         maximasGolsTableBody_2_5.appendChild(row);
     });
