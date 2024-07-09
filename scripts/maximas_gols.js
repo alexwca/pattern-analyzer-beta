@@ -44,17 +44,40 @@ function calculateMaximasGols(gameArray) {
                 const totalGols = score1 + score2;
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentUnder2_5: 0, maxUnder2_5: 0, currentUnder3_5: 0, maxUnder3_5: 0, currentUnder5: 0, maxUnder5: 0 };
+                    teamStats[team1] = { 
+                        currentUnder2_5: 0, 
+                        maxUnder2_5: 0, 
+                        currentUnder3_5: 0, 
+                        maxUnder3_5: 0, 
+                        currentUnder5: 0, 
+                        maxUnder5: 0, 
+                        gamesPlayed: 0, 
+                        under2_5Total: 0 
+                    };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentUnder2_5: 0, maxUnder2_5: 0, currentUnder3_5: 0, maxUnder3_5: 0, currentUnder5: 0, maxUnder5: 0 };
+                    teamStats[team2] = { 
+                        currentUnder2_5: 0, 
+                        maxUnder2_5: 0, 
+                        currentUnder3_5: 0, 
+                        maxUnder3_5: 0, 
+                        currentUnder5: 0, 
+                        maxUnder5: 0, 
+                        gamesPlayed: 0, 
+                        under2_5Total: 0 
+                    };
                 }
+
+                teamStats[team1].gamesPlayed++;
+                teamStats[team2].gamesPlayed++;
 
                 if (totalGols < 2.5) {
                     teamStats[team1].currentUnder2_5++;
                     teamStats[team2].currentUnder2_5++;
                     teamStats[team1].maxUnder2_5 = Math.max(teamStats[team1].maxUnder2_5, teamStats[team1].currentUnder2_5);
                     teamStats[team2].maxUnder2_5 = Math.max(teamStats[team2].maxUnder2_5, teamStats[team2].currentUnder2_5);
+                    teamStats[team1].under2_5Total++;
+                    teamStats[team2].under2_5Total++;
                 } else {
                     teamStats[team1].currentUnder2_5 = 0;
                     teamStats[team2].currentUnder2_5 = 0;
@@ -95,9 +118,9 @@ function displayMaximasGols(teamStats) {
     maximasGolsTableBody_3_5.innerHTML = ''; // Limpar o corpo da tabela de máximas < 3.5
     maximasGolsTableBody_5.innerHTML = ''; // Limpar o corpo da tabela de máximas < 5
 
-    const sortedTeamStats_2_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.currentUnder2_5 - a.currentUnder2_5);
-    const sortedTeamStats_3_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.currentUnder3_5 - a.currentUnder3_5);
-    const sortedTeamStats_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.currentUnder5 - a.currentUnder5);
+    const sortedTeamStats_2_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.maxUnder2_5 - a.maxUnder2_5);
+    const sortedTeamStats_3_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.maxUnder3_5 - a.maxUnder3_5);
+    const sortedTeamStats_5 = Object.entries(teamStats).sort(([, a], [, b]) => b.maxUnder5 - a.maxUnder5);
 
     sortedTeamStats_2_5.forEach(([team, stats]) => {
         const row = document.createElement('tr');
@@ -105,6 +128,8 @@ function displayMaximasGols(teamStats) {
             <td>${team}</td>
             <td>${stats.currentUnder2_5}</td>
             <td>${stats.maxUnder2_5}</td>
+            <td>${stats.gamesPlayed}</td>
+            <td>${stats.under2_5Total}</td>
         `;
         maximasGolsTableBody_2_5.appendChild(row);
     });
@@ -132,6 +157,11 @@ function displayMaximasGols(teamStats) {
     document.getElementById('maximasGolsTable_2_5').style.display = 'block';
     document.getElementById('maximasGolsTable_3_5').style.display = 'block';
     document.getElementById('maximasGolsTable_5').style.display = 'block';
+
+    // Ordenação padrão pela coluna de máxima atual (coluna 1, que é a segunda coluna)
+    sortTable('maximasGolsTable_2_5', 1, 'desc');
+    sortTable('maximasGolsTable_3_5', 1, 'desc');
+    sortTable('maximasGolsTable_5', 1, 'desc');
 }
 
 function sortTable(tableId, column, order) {
@@ -160,7 +190,10 @@ function sortTable(tableId, column, order) {
 
 function toggleSort(tableId, column) {
     const table = document.getElementById(tableId);
-    const button = table.querySelectorAll('th button')[column];
+    const button = table.querySelector(`th button[data-order]`);
+
+    if (!button) return; // Verifica se o botão existe antes de tentar acessar o atributo
+
     const currentOrder = button.getAttribute('data-order') || 'asc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
 

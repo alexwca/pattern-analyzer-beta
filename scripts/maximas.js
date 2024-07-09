@@ -150,14 +150,18 @@ function sortTable(tableId, column, order) {
 
 function toggleSort(tableId, column) {
     const table = document.getElementById(tableId);
-    const headers = Array.from(table.querySelectorAll('th button'));
-    const currentOrder = headers[column].dataset.order;
+    const button = table.querySelector(`th button[data-order]`);
 
+    if (!button) return; // Verifica se o botão existe antes de tentar acessar o atributo
+
+    const currentOrder = button.getAttribute('data-order') || 'asc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    headers.forEach(header => header.dataset.order = 'asc');
-    headers[column].dataset.order = newOrder;
+
+    table.querySelectorAll('th button').forEach(btn => btn.setAttribute('data-order', 'asc'));
+    button.setAttribute('data-order', newOrder);
 
     sortTable(tableId, column, newOrder);
+
 }
 
 // Função principal para ser chamada no clique do botão
