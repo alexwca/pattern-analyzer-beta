@@ -43,16 +43,20 @@ function calculateMaximas(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
+                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0 };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0 };
+                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0 };
                 }
+
+                teamStats[team1].gamesPlayed++;
+                teamStats[team2].gamesPlayed++;
 
                 if (score1 > score2) {
                     // Team 1 wins, reset its current streak
                     teamStats[team1].currentWithoutWin = 0;
                     teamStats[team1].wins++;
+                    teamStats[team2].losses++;
 
                     // Update Team 2
                     teamStats[team2].currentWithoutWin++;
@@ -63,6 +67,7 @@ function calculateMaximas(gameArray) {
                     // Team 2 wins, reset its current streak
                     teamStats[team2].currentWithoutWin = 0;
                     teamStats[team2].wins++;
+                    teamStats[team1].losses++;
 
                     // Update Team 1
                     teamStats[team1].currentWithoutWin++;
@@ -92,10 +97,8 @@ function calculateMaximas(gameArray) {
 // Função para exibir as máximas no navegador
 function displayMaximas(teamStats) {
     const maximasTableBody = document.getElementById('maximasTable').querySelector('tbody');
-    const statsTableBody = document.getElementById('statsTable').querySelector('tbody');
 
     maximasTableBody.innerHTML = ''; // Limpar o corpo da tabela de máximas
-    statsTableBody.innerHTML = ''; // Limpar o corpo da tabela de estatísticas
 
     // Ordenar por currentWithoutWin de forma decrescente inicialmente
     const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentWithoutWin - a.currentWithoutWin);
@@ -107,21 +110,18 @@ function displayMaximas(teamStats) {
             <td>${team}</td>
             <td style="text-align: center">${stats.currentWithoutWin}</td>
             <td style="text-align: center">${stats.maxNoWinsStreak}</td>
+            <td style="text-align: center">${stats.gamesPlayed}</td>
+            <td style="text-align: center">${stats.wins} - <small>${(100 * (stats.wins / stats.gamesPlayed)).toFixed(2)}%</small></td>
+            <td style="text-align: center">${stats.losses} - <small>${(100 * (stats.losses / stats.gamesPlayed)).toFixed(2)}%</small></td>
+            <td style="text-align: center">${stats.draws} - <small>${(100 * (stats.draws / stats.gamesPlayed)).toFixed(2)}%</small></td>
         `;
         maximasTableBody.appendChild(maximasRow);
-
-        // Adicionar à tabela de estatísticas
-        const statsRow = document.createElement('tr');
-        statsRow.innerHTML = `
-            <td>${team}</td>
-            <td style="text-align: center">${stats.wins}</td>
-            <td style="text-align: center">${stats.draws}</td>
-        `;
-        statsTableBody.appendChild(statsRow);
     });
 
     document.getElementById('maximasTable').style.display = 'block';
-    document.getElementById('statsTable').style.display = 'block';
+
+    // Ordenação padrão pela coluna de máxima atual (coluna 1, que é a segunda coluna)
+    sortTable('maximasTable', 1, 'desc');
 }
 
 function sortTable(tableId, column, order) {
@@ -162,6 +162,7 @@ function toggleSort(tableId, column) {
 
     sortTable(tableId, column, newOrder);
 
+    console.log(currentOrder)
 }
 
 // Função principal para ser chamada no clique do botão

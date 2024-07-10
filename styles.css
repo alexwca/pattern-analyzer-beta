@@ -32,6 +32,9 @@ li a {
     color: #333;
     text-decoration: none;
 }
+small {
+    color: #218c74;
+}
 
 
 #filterExpose {
