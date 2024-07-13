@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Desempenho dos Times de Futebol</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3>Insira os dados dos jogos:</h3>
+    <textarea id="dataInput" rows="10" cols="100"></textarea>
+    <button onclick="analyzeData()">Analisar Dados</button>
+
+    <h3>Desempenho ao Longo do Tempo</h3>
+    <canvas id="performanceChart"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function sanitizeData(data) {
+            return data.replace(/\+/g, '').trim();
+        }
+
+        function createGameArray(data) {
+            const sanitizedData = sanitizeData(data);
+            const regex = /"([^"]+)"/g;
+            const games = [];
+            let match;
+
+            while ((match = regex.exec(sanitizedData)) !== null) {
+                games.push(match[1].trim());
+            }
+
+            return games;
+        }
+
+        function organizeGamesInColumns(games, columns) {
+            const rows = Math.ceil(games.length / columns);
+            const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
+
+            games.forEach((game, index) => {
+                const row = Math.floor(index / columns);
+                const col = index % columns;
+                gameArray[row][col] = game;
+            });
+
+            return gameArray;
+        }
+
+        function invertGameArray(gameArray) {
+            return gameArray.reverse();
+        }
+
+        function calculatePerformanceTrends(gameArray) {
+            const teamStats = {};
+
+            gameArray.forEach((row, rowIndex) => {
+                row.forEach((game, gameIndex) => {
+                    if (game) {
+                        const [teams, score] = game.split(' ').join(' ').split(/\s(?=\d)/);
+                        const [team1, team2] = teams.split(' x ');
+                        const [score1, score2] = score.split('-').map(Number);
+
+                        if (!teamStats[team1]) {
+                            teamStats[team1] = { performance: [], totalGames: 0 };
+                        }
+                        if (!teamStats[team2]) {
+                            teamStats[team2] = { performance: [], totalGames: 0 };
+                        }
+
+                        teamStats[team1].totalGames++;
+                        teamStats[team2].totalGames++;
+
+                        if (score1 > score2) {
+                            teamStats[team1].performance.push({ game: teamStats[team1].totalGames, result: 'W' });
+                            teamStats[team2].performance.push({ game: teamStats[team2].totalGames, result: 'L' });
+                        } else if (score2 > score1) {
+                            teamStats[team2].performance.push({ game: teamStats[team2].totalGames, result: 'W' });
+                            teamStats[team1].performance.push({ game: teamStats[team1].totalGames, result: 'L' });
+                        } else {
+                            teamStats[team1].performance.push({ game: teamStats[team1].totalGames, result: 'D' });
+                            teamStats[team2].performance.push({ game: teamStats[team2].totalGames, result: 'D' });
+                        }
+                    }
+                });
+            });
+
+            return teamStats;
+        }
+
+        function renderPerformanceChart(teamStats) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const labels = [];
+            const datasets = [];
+
+            for (const team in teamStats) {
+                const stats = teamStats[team];
+                const data = stats.performance.map(perf => {
+                    if (perf.result === 'W') return 3;
+                    if (perf.result === 'D') return 1;
+                    return 0;
+                });
+
+                datasets.push({
+                    label: team,
+                    data: data,
+                    fill: false,
+                    borderColor: getRandomColor(),
+                    tension: 0.1
+                });
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jogos'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Pontos'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function analyzeData() {
+            const data = document.getElementById('dataInput').value;
+            const games = createGameArray(data);
+            const gameArray = organizeGamesInColumns(games, 20);
+            const invertedGameArray = invertGameArray(gameArray);
+
+            const performanceTrends = calculatePerformanceTrends(invertedGameArray);
+            renderPerformanceChart(performanceTrends);
+        }
+    </script>
+
+</body>
+
+</html>

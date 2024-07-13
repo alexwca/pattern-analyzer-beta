@@ -43,10 +43,10 @@ function calculateMaximas(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0 };
+                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [] };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0 };
+                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [] };
                 }
 
                 teamStats[team1].gamesPlayed++;
@@ -56,7 +56,11 @@ function calculateMaximas(gameArray) {
                     // Team 1 wins, reset its current streak
                     teamStats[team1].currentWithoutWin = 0;
                     teamStats[team1].wins++;
+                    teamStats[team1].recentForm.push('W');
+                    if (teamStats[team1].recentForm.length > 5) teamStats[team1].recentForm.shift();
                     teamStats[team2].losses++;
+                    teamStats[team2].recentForm.push('L');
+                    if (teamStats[team2].recentForm.length > 5) teamStats[team2].recentForm.shift();
 
                     // Update Team 2
                     teamStats[team2].currentWithoutWin++;
@@ -67,7 +71,11 @@ function calculateMaximas(gameArray) {
                     // Team 2 wins, reset its current streak
                     teamStats[team2].currentWithoutWin = 0;
                     teamStats[team2].wins++;
+                    teamStats[team2].recentForm.push('W');
+                    if (teamStats[team2].recentForm.length > 5) teamStats[team2].recentForm.shift();
                     teamStats[team1].losses++;
+                    teamStats[team1].recentForm.push('L');
+                    if (teamStats[team1].recentForm.length > 5) teamStats[team1].recentForm.shift();
 
                     // Update Team 1
                     teamStats[team1].currentWithoutWin++;
@@ -80,6 +88,10 @@ function calculateMaximas(gameArray) {
                     teamStats[team2].currentWithoutWin++;
                     teamStats[team1].draws++;
                     teamStats[team2].draws++;
+                    teamStats[team1].recentForm.push('D');
+                    if (teamStats[team1].recentForm.length > 5) teamStats[team1].recentForm.shift();
+                    teamStats[team2].recentForm.push('D');
+                    if (teamStats[team2].recentForm.length > 5) teamStats[team2].recentForm.shift();
                     if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
                         teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
                     }
@@ -90,6 +102,27 @@ function calculateMaximas(gameArray) {
             }
         });
     });
+
+    // Calculate win probability for each team
+    for (const team in teamStats) {
+        const stats = teamStats[team];
+        const winRate = stats.wins / stats.gamesPlayed;
+        const drawRate = stats.draws / stats.gamesPlayed;
+        const lossRate = stats.losses / stats.gamesPlayed;
+
+        // Proximity of current streak to maximum no-win streak
+        const streakProximity = (stats.maxNoWinsStreak - stats.currentWithoutWin) / stats.maxNoWinsStreak;
+
+        // Recent form weighted
+        const recentFormWeight = stats.recentForm.reduce((acc, result) => {
+            if (result === 'W') return acc + 1;
+            if (result === 'D') return acc + 0.5;
+            return acc;
+        }, 0) / 5;
+
+        // Combining factors
+        stats.winProbability = 0.4 * winRate + 0.3 * recentFormWeight + 0.2 * (1 - streakProximity) + 0.1 * drawRate;
+    }
 
     return teamStats;
 }
@@ -114,6 +147,7 @@ function displayMaximas(teamStats) {
             <td style="text-align: center">${stats.wins} - <small>${(100 * (stats.wins / stats.gamesPlayed)).toFixed(2)}%</small></td>
             <td style="text-align: center">${stats.losses} - <small>${(100 * (stats.losses / stats.gamesPlayed)).toFixed(2)}%</small></td>
             <td style="text-align: center">${stats.draws} - <small>${(100 * (stats.draws / stats.gamesPlayed)).toFixed(2)}%</small></td>
+            <td style="text-align: center">${(100 * stats.winProbability).toFixed(2)}%</td>
         `;
         maximasTableBody.appendChild(maximasRow);
     });

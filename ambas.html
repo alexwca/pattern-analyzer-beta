@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Máximas de Times</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="ranking.html">Ranking</a></li>
+            <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
+            <li><a href="maximas.html">Máximas de vitórias</a></li>
+            <li><a href="ambas.html">Máximas de ambas marcam</a></li>
+            <li><a href="maximas_gols.html">Máximas de Gols</a></li>
+        </ul>
+    </nav>
+    <h1>Máximas de Ambas Marcam</h1>
+    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
+    <br>
+    <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
+    <button onclick="clearData()">LIMPAR</button>
+
+    <div style="display: flex; gap: 20px; justify-content: space-around;">
+        <table id="maximasTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>
+                        <button onclick="toggleSort('maximasTable', 1)" data-order="asc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                                </path>
+                            </svg>
+                        </button>
+                        Atual
+                    </th>
+                    <th>
+                        <button onclick="toggleSort('maximasTable', 2)" data-order="asc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                                </path>
+                            </svg>
+                        </button>
+                        Maior Máxima
+                    </th>
+                    <th>
+                        <button onclick="toggleSort('maximasTable', 3)" data-order="asc">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                                </path>
+                            </svg>
+                        </button>
+                        Probabilidade de pagar Ambas
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="scripts/ambas.js"></script>
+    <script src="scripts/common.js"></script>
+</body>
+
+</html>
