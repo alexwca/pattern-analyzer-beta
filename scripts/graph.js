@@ -12,20 +12,40 @@ function createGameArray(data) {
         games.push(match[1].trim());
     }
 
-    return games;
+    return games.reverse();
 }
 
 function organizeGamesInColumns(games, columns) {
     const rows = Math.ceil(games.length / columns);
-    const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
+    // const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
+    const array = [];
+    var countRow = 0;
+    var countColumn = 0;
+    var row = [];
+    var column = [];
 
-    games.forEach((game, index) => {
-        const row = Math.floor(index / columns);
-        const col = index % columns;
-        gameArray[row][col] = game;
-    });
+    // for (let i = 0; i < games.length; i++) {
+    //     if (countColumn < columns) {
+    //         row.unshift(games[i])
+    //         countColumn += 1;
+    //     }
+    //     if(countColumn == columns) {
+    //         // console.log(row)
+    //         countColumn = 0;
+    //         array.unshift(row);
+    //         row = [];
+    //     }
 
-    return gameArray;
+    // }
+
+    // games.forEach((game, index) => {
+    //     const row = Math.floor(index / columns);
+    //     const col = index % columns;
+    //     gameArray[row][col] = game;
+    // });
+
+// console.log(array)
+    return array;
 }
 
 function invertGameArray(gameArray) {
