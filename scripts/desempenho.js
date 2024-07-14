@@ -1,5 +1,3 @@
-let chartInstance = null;
-
 function sanitizeData(data) {
     return data.replace(/\+/g, '').trim();
 }
@@ -17,7 +15,7 @@ function createGameArray(data) {
     return games;
 }
 
-function organizeGamesInTable(games, columns) {
+function organizeGamesInColumns(games, columns) {
     const rows = Math.ceil(games.length / columns);
     const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
 
@@ -27,54 +25,50 @@ function organizeGamesInTable(games, columns) {
         gameArray[row][col] = game;
     });
 
-    return gameArray.reverse(); // Invertendo a ordem para que a hora mais distante fique em primeiro
+    return gameArray;
 }
 
-function linearizeGameArray(gameArray) {
-    const linearArray = [];
-    const rows = gameArray.length;
-    const columns = gameArray[0].length;
-
-    for (let col = 0; col < columns; col++) {
-        for (let row = 0; row < rows; row++) {
-            if (gameArray[row][col]) {
-                linearArray.push(gameArray[row][col]);
-            }
-        }
-    }
-    return linearArray;
+function invertGameArray(gameArray) {
+    return gameArray.map(row => row.reverse()).reverse();
 }
 
-function calculatePerformanceTrends(games) {
+function calculatePerformanceTrends(gameArray) {
     const teamStats = {};
 
-    games.forEach((game) => {
-        if (game) {
-            const [teams, score] = game.split('\n');
-            const [team1, team2] = teams.split(' x ');
-            const [score1, score2] = score.split('-').map(Number);
+    gameArray.forEach((row) => {
+        if (!Array.isArray(row)) return; // Verifica se row é um array
 
-            if (!teamStats[team1]) {
-                teamStats[team1] = { performance: [0] };
-            }
-            if (!teamStats[team2]) {
-                teamStats[team2] = { performance: [0] };
-            }
+        row.forEach((game) => {
+            if (game) {
+                const [teams, score] = game.split('\n');
+                const [team1, team2] = teams.split(' x ');
+                const [score1, score2] = score.split('-').map(Number);
 
-            const team1LastPerformance = teamStats[team1].performance.slice(-1)[0];
-            const team2LastPerformance = teamStats[team2].performance.slice(-1)[0];
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { performance: [0], results: [] };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { performance: [0], results: [] };
+                }
 
-            if (score1 > score2) {
-                teamStats[team1].performance.push(team1LastPerformance + 1);
-                teamStats[team2].performance.push(team2LastPerformance - 1);
-            } else if (score2 > score1) {
-                teamStats[team2].performance.push(team2LastPerformance + 1);
-                teamStats[team1].performance.push(team1LastPerformance - 1);
-            } else {
-                teamStats[team1].performance.push(team1LastPerformance);
-                teamStats[team2].performance.push(team2LastPerformance);
+                const team1LastPerformance = teamStats[team1].performance.slice(-1)[0] || 0;
+                const team2LastPerformance = teamStats[team2].performance.slice(-1)[0] || 0;
+
+                if (score1 > score2) {
+                    teamStats[team1].performance.push(team1LastPerformance + 1);
+                    teamStats[team2].performance.push(team2LastPerformance - 1);
+                } else if (score2 > score1) {
+                    teamStats[team2].performance.push(team2LastPerformance + 1);
+                    teamStats[team1].performance.push(team1LastPerformance - 1);
+                } else {
+                    teamStats[team1].performance.push(team1LastPerformance);
+                    teamStats[team2].performance.push(team2LastPerformance);
+                }
+
+                teamStats[team1].results.push(`${team1} ${score1}-${score2} ${team2}`);
+                teamStats[team2].results.push(`${team1} ${score1}-${score2} ${team2}`);
             }
-        }
+        });
     });
 
     return teamStats;
@@ -82,12 +76,6 @@ function calculatePerformanceTrends(games) {
 
 function renderPerformanceChart(teamStats) {
     const ctx = document.getElementById('performanceChart').getContext('2d');
-
-    // Destrói a instância anterior do gráfico, se existir
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-
     const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
     const datasets = [];
 
@@ -98,17 +86,34 @@ function renderPerformanceChart(teamStats) {
             data: stats.performance,
             fill: false,
             borderColor: getRandomColor(),
-            tension: 0.1
+            tension: 0.1,
+            gameResults: stats.results // Add game results to dataset
         });
     }
 
-    chartInstance = new Chart(ctx, {
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+
+    performanceChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: datasets
         },
         options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const dataset = context.dataset;
+                            const index = context.dataIndex;
+                            const gameResult = dataset.gameResults[index] || 'No game result';
+                            return `${context.dataset.label}: ${context.raw} (${gameResult})`;
+                        }
+                    }
+                }
+            },
             scales: {
                 x: {
                     beginAtZero: true,
@@ -137,13 +142,16 @@ function getRandomColor() {
     return color;
 }
 
+let performanceChart; // Initialize performanceChart variable
+
 function analyzeData() {
     const data = document.getElementById('dataInput').value;
-    document.getElementById('performanceChart').style.display = 'block !mportant';
-    const games = createGameArray(data);
-    const gameArray = organizeGamesInTable(games, 20); // Organizamos conforme a lógica da tabela
-    const linearGameArray = linearizeGameArray(gameArray); // Linearizamos os jogos conforme descrito
+    document.getElementById('performanceChart').style.display = 'block !important';
 
-    const performanceTrends = calculatePerformanceTrends(linearGameArray);
+    const games = createGameArray(data);
+    const gameArray = organizeGamesInColumns(games, 20);
+    const invertedGameArray = invertGameArray(gameArray);
+
+    const performanceTrends = calculatePerformanceTrends(invertedGameArray);
     renderPerformanceChart(performanceTrends);
 }
