@@ -100,9 +100,9 @@ function displayMaximas(teamStats) {
             <td>${stats.currentNoBothTeamsScore}</td>
             <td>${stats.maxNoBothTeamsScore}</td>
             <td>${stats.maxBothTeamsScore}</td>
-            <td>${(stats.noBothTeamsScoreProbability * 100).toFixed(2)}%</td>
-        `;
-        maximasTableBody.appendChild(maximasRow);
+            `;
+            maximasTableBody.appendChild(maximasRow);
+            // <td>${(stats.noBothTeamsScoreProbability * 100).toFixed(2)}%</td>
     });
 
     document.getElementById('maximasTable').style.display = 'block';
