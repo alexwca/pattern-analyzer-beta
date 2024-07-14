@@ -43,25 +43,25 @@ function calculateMaximasAmbosMarcam(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentBothTeamsScore: 0, maxBothTeamsScore: 0, totalBothTeamsScore: 0, gamesPlayed: 0 };
+                    teamStats[team1] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, gamesPlayed: 0 };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentBothTeamsScore: 0, maxBothTeamsScore: 0, totalBothTeamsScore: 0, gamesPlayed: 0 };
+                    teamStats[team2] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, gamesPlayed: 0 };
                 }
 
                 teamStats[team1].gamesPlayed++;
                 teamStats[team2].gamesPlayed++;
 
-                if (score1 > 0 && score2 > 0) {
-                    teamStats[team1].currentBothTeamsScore++;
-                    teamStats[team2].currentBothTeamsScore++;
-                    teamStats[team1].totalBothTeamsScore++;
-                    teamStats[team2].totalBothTeamsScore++;
-                    teamStats[team1].maxBothTeamsScore = Math.max(teamStats[team1].maxBothTeamsScore, teamStats[team1].currentBothTeamsScore);
-                    teamStats[team2].maxBothTeamsScore = Math.max(teamStats[team2].maxBothTeamsScore, teamStats[team2].currentBothTeamsScore);
+                if (score1 === 0 || score2 === 0) {
+                    teamStats[team1].currentNoBothTeamsScore++;
+                    teamStats[team2].currentNoBothTeamsScore++;
+                    teamStats[team1].totalNoBothTeamsScore++;
+                    teamStats[team2].totalNoBothTeamsScore++;
+                    teamStats[team1].maxNoBothTeamsScore = Math.max(teamStats[team1].maxNoBothTeamsScore, teamStats[team1].currentNoBothTeamsScore);
+                    teamStats[team2].maxNoBothTeamsScore = Math.max(teamStats[team2].maxNoBothTeamsScore, teamStats[team2].currentNoBothTeamsScore);
                 } else {
-                    teamStats[team1].currentBothTeamsScore = 0;
-                    teamStats[team2].currentBothTeamsScore = 0;
+                    teamStats[team1].currentNoBothTeamsScore = 0;
+                    teamStats[team2].currentNoBothTeamsScore = 0;
                 }
             }
         });
@@ -70,7 +70,7 @@ function calculateMaximasAmbosMarcam(gameArray) {
     // Calcular a probabilidade
     for (const team in teamStats) {
         const stats = teamStats[team];
-        stats.bothTeamsScoreProbability = (stats.totalBothTeamsScore / stats.gamesPlayed).toFixed(2);
+        stats.noBothTeamsScoreProbability = (stats.totalNoBothTeamsScore / stats.gamesPlayed).toFixed(2);
     }
 
     return teamStats;
@@ -81,17 +81,17 @@ function displayMaximas(teamStats) {
 
     maximasTableBody.innerHTML = ''; // Limpar o corpo da tabela de máximas
 
-    // Ordenar por currentBothTeamsScore de forma decrescente inicialmente
-    const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentBothTeamsScore - a.currentBothTeamsScore);
+    // Ordenar por currentNoBothTeamsScore de forma decrescente inicialmente
+    const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentNoBothTeamsScore - a.currentNoBothTeamsScore);
 
     sortedTeamStats.forEach(([team, stats]) => {
         // Adicionar à tabela de máximas
         const maximasRow = document.createElement('tr');
         maximasRow.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentBothTeamsScore}</td>
-            <td>${stats.maxBothTeamsScore}</td>
-            <td>${stats.bothTeamsScoreProbability * 100}%</td>
+            <td>${stats.currentNoBothTeamsScore}</td>
+            <td>${stats.maxNoBothTeamsScore}</td>
+            <td>${stats.noBothTeamsScoreProbability * 100}%</td>
         `;
         maximasTableBody.appendChild(maximasRow);
     });
