@@ -120,3 +120,8 @@ table tr:nth-child(even) {
 #maximasGolsTable_3_5, #maximasGolsTable_5 {
     flex-grow: 1
 }
+
+#performanceChart {
+    width: 100%;
+    display: none;
+}

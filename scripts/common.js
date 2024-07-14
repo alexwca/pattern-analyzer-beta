@@ -19,6 +19,9 @@ function clearData() {
     if (document.getElementById('matchTable')) {
         document.getElementById('matchTable').style.display = 'none';
     }
+    if (document.getElementById('performanceChart')) {
+        document.getElementById('performanceChart').style.display = 'none';
+    }
     if (document.getElementById('maximasGolsTable_2_5')) {
         document.getElementById('maximasGolsTable_2_5').style.display = 'none';
         document.getElementById('maximasGolsTable_3_5').style.display = 'none';

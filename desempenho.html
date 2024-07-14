@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Desempenho ao Longo do Tempo</title>
+    <title>Desempenho dos Times</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -17,21 +18,20 @@
             <li><a href="maximas.html">Máximas de vitórias</a></li>
             <li><a href="ambas.html">Máximas de ambas marcam</a></li>
             <li><a href="maximas_gols.html">Máximas de Gols</a></li>
-            <!-- <li><a href="desempenho.html">Gráfico de Desempenho</a></li> -->
+            <li><a href="desempenho.html">Gráfico de Desempenho</a></li>
         </ul>
     </nav>
-    <h1>Desempenho ao Longo do Tempo</h1>
-    <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
+    <h1>Desempenho dos Times</h1>
+    <textarea id="dataInput" rows="10" cols="100"></textarea>
     <br>
-    <button onclick="analyzeData()">GERAR GRÁFICO</button>
+    <button onclick="analyzeData()">Analisar Desempenho</button>
     <button onclick="clearData()">LIMPAR</button>
 
-    <br>
-
+    <h3>Gráfico de Desempenho dos Times</h3>
     <canvas id="performanceChart"></canvas>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="scripts/graph.js"></script>
+    <script src="scripts/desempenho.js"></script>
+    <script src="scripts/common.js"></script>
 
 </body>
 
