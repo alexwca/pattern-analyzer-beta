@@ -1,3 +1,37 @@
+function sanitizeData(data) {
+    return data.replace(/\+/g, '').trim();
+}
+
+function createGameArray(data) {
+    const sanitizedData = sanitizeData(data);
+    const regex = /"([^"]+)"/g;
+    const games = [];
+    let match;
+
+    while ((match = regex.exec(sanitizedData)) !== null) {
+        games.push(match[1].trim());
+    }
+
+    return games;
+}
+
+function organizeGamesInColumns(games, columns) {
+    const rows = Math.ceil(games.length / columns);
+    const gameArray = Array.from({ length: rows }, () => Array(columns).fill(''));
+
+    games.forEach((game, index) => {
+        const row = Math.floor(index / columns);
+        const col = index % columns;
+        gameArray[row][col] = game;
+    });
+
+    return gameArray;
+}
+
+function invertGameArray(gameArray) {
+    return gameArray.reverse();
+}
+
 function calculateMaximasAmbosMarcam(gameArray) {
     const teamStats = {};
 
@@ -9,14 +43,11 @@ function calculateMaximasAmbosMarcam(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, gamesPlayed: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0, totalBothTeamsScore: 0 };
+                    teamStats[team1] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, totalBothTeamsScore: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0 };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, gamesPlayed: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0, totalBothTeamsScore: 0 };
+                    teamStats[team2] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, totalBothTeamsScore: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0 };
                 }
-
-                teamStats[team1].gamesPlayed++;
-                teamStats[team2].gamesPlayed++;
 
                 if (score1 === 0 || score2 === 0) {
                     teamStats[team1].currentNoBothTeamsScore++;
@@ -43,14 +74,13 @@ function calculateMaximasAmbosMarcam(gameArray) {
         });
     });
 
-    // Calcular a probabilidade
+    // Calcular a probabilidade de pagamento
     for (const team in teamStats) {
         const stats = teamStats[team];
-        stats.noBothTeamsScoreProbability = (stats.totalNoBothTeamsScore / stats.gamesPlayed).toFixed(2);
         stats.paymentProbability = (
-            (stats.totalBothTeamsScore / stats.gamesPlayed) * 0.5 +
-            (stats.currentNoBothTeamsScore / stats.gamesPlayed) * 0.3 +
-            (stats.maxNoBothTeamsScore / stats.gamesPlayed) * 0.2
+            (stats.totalBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.5 +
+            (stats.currentNoBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.3 +
+            (stats.maxNoBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.2
         ).toFixed(2);
     }
 
@@ -73,7 +103,7 @@ function displayMaximas(teamStats) {
             <td>${stats.currentNoBothTeamsScore}</td>
             <td>${stats.maxNoBothTeamsScore}</td>
             <td>${stats.totalBothTeamsScore}</td>
-            <td>${stats.paymentProbability * 100}%</td>
+            <td>${(stats.paymentProbability * 100).toFixed(2)}%</td>
         `;
         maximasTableBody.appendChild(maximasRow);
     });
