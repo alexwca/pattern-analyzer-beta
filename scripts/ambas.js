@@ -29,7 +29,7 @@ function organizeGamesInColumns(games, columns) {
 }
 
 function invertGameArray(gameArray) {
-    return gameArray.reverse();
+    return gameArray.map(row => row).reverse();
 }
 
 function calculateMaximasAmbosMarcam(gameArray) {

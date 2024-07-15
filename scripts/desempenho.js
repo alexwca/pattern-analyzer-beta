@@ -31,12 +31,14 @@ function organizeGamesInColumns(games, columns) {
     return gameArray;
 }
 
-function invertGameArray(gameArray) {
-    return gameArray.map(row => row.reverse()).reverse();
+function invertGameArray(gameArray) {    
+    return gameArray.map(row => row).reverse();
+
 }
 
 function calculatePerformanceTrends(gameArray) {
     const teamStats = {};
+    console.log(gameArray)
 
     gameArray.forEach((row) => {
         if (!Array.isArray(row)) return; // Verifica se row é um array

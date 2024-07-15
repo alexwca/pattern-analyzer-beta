@@ -33,11 +33,12 @@ function organizeGamesInColumns(games, columns) {
 }
 
 function invertGameArray(gameArray) {
-    return gameArray.map(row => row.reverse()).reverse();
+    return gameArray.map(row => row).reverse();
 }
 
 function calculateMaximasGols(gameArray) {
     const teamStats = {};
+    console.log(gameArray)
 
     gameArray.forEach(row => {
         row.forEach(game => {
