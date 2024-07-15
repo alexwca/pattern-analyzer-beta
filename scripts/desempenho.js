@@ -1,4 +1,3 @@
-
 let performanceChart;
 
 function sanitizeData(data) {
@@ -33,7 +32,6 @@ function organizeGamesInColumns(games, columns) {
 
 function invertGameArray(gameArray) {    
     return gameArray.map(row => row).reverse();
-
 }
 
 function calculatePerformanceTrends(gameArray) {
@@ -49,22 +47,25 @@ function calculatePerformanceTrends(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { performance: [0], results: [] };
+                    teamStats[team1] = { performance: [], results: [] };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { performance: [0], results: [] };
+                    teamStats[team2] = { performance: [], results: [] };
                 }
 
                 const team1LastPerformance = teamStats[team1].performance.slice(-1)[0] || 0;
                 const team2LastPerformance = teamStats[team2].performance.slice(-1)[0] || 0;
 
                 if (score1 > score2) {
+                    // Vitória do time 1
                     teamStats[team1].performance.push(team1LastPerformance + 1);
                     teamStats[team2].performance.push(team2LastPerformance - 1);
                 } else if (score2 > score1) {
+                    // Vitória do time 2
                     teamStats[team2].performance.push(team2LastPerformance + 1);
                     teamStats[team1].performance.push(team1LastPerformance - 1);
                 } else {
+                    // Empate
                     teamStats[team1].performance.push(team1LastPerformance);
                     teamStats[team2].performance.push(team2LastPerformance);
                 }
@@ -127,6 +128,7 @@ function renderPerformanceChart(teamStats) {
                     }
                 },
                 y: {
+                    beginAtZero: false, // Permitir valores negativos
                     title: {
                         display: true,
                         text: 'Desempenho'
