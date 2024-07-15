@@ -38,7 +38,6 @@ function invertGameArray(gameArray) {
 
 function calculateMaximasGols(gameArray) {
     const teamStats = {};
-    console.log(gameArray)
 
     gameArray.forEach(row => {
         row.forEach(game => {

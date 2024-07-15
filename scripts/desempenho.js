@@ -38,7 +38,6 @@ function invertGameArray(gameArray) {
 
 function calculatePerformanceTrends(gameArray) {
     const teamStats = {};
-    console.log(gameArray)
 
     gameArray.forEach((row) => {
         if (!Array.isArray(row)) return; // Verifica se row é um array
