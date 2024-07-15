@@ -1,3 +1,6 @@
+
+let performanceChart;
+
 function sanitizeData(data) {
     return data.replace(/\+/g, '').trim();
 }
@@ -141,8 +144,6 @@ function getRandomColor() {
     }
     return color;
 }
-
-let performanceChart; // Initialize performanceChart variable
 
 function analyzeData() {
     const data = document.getElementById('dataInput').value;

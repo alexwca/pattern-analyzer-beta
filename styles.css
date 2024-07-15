@@ -121,7 +121,7 @@ table tr:nth-child(even) {
     flex-grow: 1
 }
 
-#performanceChart {
+#performanceChart, #performanceChartOver25 {
     width: 100%;
     display: none;
 }

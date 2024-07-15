@@ -1,3 +1,7 @@
+
+let performanceChart;
+let performanceChartOver25;
+
 function sanitizeData(data) {
     return data.replace(/\+/g, '').trim();
 }
@@ -29,7 +33,7 @@ function organizeGamesInColumns(games, columns) {
 }
 
 function invertGameArray(gameArray) {
-    return gameArray.reverse();
+    return gameArray.map(row => row.reverse()).reverse();
 }
 
 function calculateMaximasGols(gameArray) {
@@ -44,29 +48,29 @@ function calculateMaximasGols(gameArray) {
                 const totalGols = score1 + score2;
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { 
-                        currentUnder2_5: 0, 
-                        maxUnder2_5: 0, 
-                        currentUnder3_5: 0, 
-                        maxUnder3_5: 0, 
-                        currentUnder5: 0, 
-                        maxUnder5: 0, 
-                        gamesPlayed: 0, 
+                    teamStats[team1] = {
+                        currentUnder2_5: 0,
+                        maxUnder2_5: 0,
+                        currentUnder3_5: 0,
+                        maxUnder3_5: 0,
+                        currentUnder5: 0,
+                        maxUnder5: 0,
+                        gamesPlayed: 0,
                         under2_5Total: 0,
-                        over2_5Total: 0 
+                        over2_5Total: 0
                     };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { 
-                        currentUnder2_5: 0, 
-                        maxUnder2_5: 0, 
-                        currentUnder3_5: 0, 
-                        maxUnder3_5: 0, 
-                        currentUnder5: 0, 
-                        maxUnder5: 0, 
-                        gamesPlayed: 0, 
+                    teamStats[team2] = {
+                        currentUnder2_5: 0,
+                        maxUnder2_5: 0,
+                        currentUnder3_5: 0,
+                        maxUnder3_5: 0,
+                        currentUnder5: 0,
+                        maxUnder5: 0,
+                        gamesPlayed: 0,
                         under2_5Total: 0,
-                        over2_5Total: 0 
+                        over2_5Total: 0
                     };
                 }
 
@@ -210,6 +214,249 @@ function toggleSort(tableId, column) {
     console.log(currentOrder)
 }
 
+function calculatePerformanceTrends(gameArray) {
+    const teamStats = {};
+
+    gameArray.forEach((row) => {
+        if (!Array.isArray(row)) return; // Verifica se row é um array
+
+        row.forEach((game) => {
+            if (game) {
+                const [teams, score] = game.split('\n');
+                const [team1, team2] = teams.split(' x ');
+                const [score1, score2] = score.split('-').map(Number);
+
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { performance: [], results: [] };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { performance: [], results: [] };
+                }
+
+                const totalGoals = score1 + score2;
+                let team1NewPerformance = teamStats[team1].performance.slice(-1)[0] || 0;
+                let team2NewPerformance = teamStats[team2].performance.slice(-1)[0] || 0;
+
+                if (totalGoals > 2.5) { // Jogos over 2.5
+                    team1NewPerformance += 1;
+                    team2NewPerformance += 1;
+                } else { // Jogos under 2.5
+                    team1NewPerformance -= 1;
+                    team2NewPerformance -= 1;
+                }
+
+                teamStats[team1].performance.push(team1NewPerformance);
+                teamStats[team2].performance.push(team2NewPerformance);
+
+                teamStats[team1].results.push(`${team1} ${score1}-${score2} ${team2}`);
+                teamStats[team2].results.push(`${team1} ${score1}-${score2} ${team2}`);
+            }
+        });
+    });
+
+    return teamStats;
+}
+
+
+
+function calculatePerformanceTrendsOver25(gameArray) {
+    const teamStatsOver25 = {};
+
+    gameArray.forEach((rowOver25) => {
+        if (!Array.isArray(rowOver25)) return; // Verifica se rowOver25 é um array
+
+        rowOver25.forEach((gameOver25) => {
+            if (gameOver25) {
+                const [teamsOver25, scoreOver25] = gameOver25.split('\n');
+                const [team1Over25, team2Over25] = teamsOver25.split(' x ');
+                const [score1Over25, score2Over25] = scoreOver25.split('-').map(Number);
+
+                if (!teamStatsOver25[team1Over25]) {
+                    teamStatsOver25[team1Over25] = { performance: [0], results: [] };
+                }
+                if (!teamStatsOver25[team2Over25]) {
+                    teamStatsOver25[team2Over25] = { performance: [0], results: [] };
+                }
+
+                const team1LastPerformanceOver25 = teamStatsOver25[team1Over25].performance.slice(-1)[0] || 0;
+                const team2LastPerformanceOver25 = teamStatsOver25[team2Over25].performance.slice(-1)[0] || 0;
+
+                const totalGoalsOver25 = score1Over25 + score2Over25;
+
+                if (score1Over25 > score2Over25) { // Team1 wins
+                    if (totalGoalsOver25 > 2.5) {
+                        // Vitória com over 2.5
+                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 + 2);
+                    } else {
+                        // Vitória com under 2.5
+                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 + 1);
+                    }
+                    // Derrota para Team2
+                    teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 - 1);
+                } else if (score2Over25 > score1Over25) { // Team2 wins
+                    if (totalGoalsOver25 > 2.5) {
+                        // Vitória com over 2.5
+                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 + 2);
+                    } else {
+                        // Vitória com under 2.5
+                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 + 1);
+                    }
+                    // Derrota para Team1
+                    teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 - 1);
+                } else { // Draw
+                    if (totalGoalsOver25 > 2.5) {
+                        // Empate com over 2.5 (sem alteração)
+                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25);
+                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25);
+                    } else {
+                        // Empate com under 2.5
+                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 - 1);
+                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 - 1);
+                    }
+                }
+
+                teamStatsOver25[team1Over25].results.push(`${team1Over25} ${score1Over25}-${score2Over25} ${team2Over25}`);
+                teamStatsOver25[team2Over25].results.push(`${team1Over25} ${score1Over25}-${score2Over25} ${team2Over25}`);
+            }
+        });
+    });
+
+    return teamStatsOver25;
+}
+
+
+
+
+
+function renderPerformanceChart(teamStats) {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
+    const datasets = [];
+
+    for (const team in teamStats) {
+        const stats = teamStats[team];
+        datasets.push({
+            label: team,
+            data: stats.performance,
+            fill: false,
+            borderColor: getRandomColor(),
+            tension: 0.1,
+            gameResults: stats.results // Add game results to dataset
+        });
+    }
+
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+
+    performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const dataset = context.dataset;
+                            const index = context.dataIndex;
+                            const gameResult = dataset.gameResults[index] || 'No game result';
+                            return `${context.dataset.label}: ${context.raw} (${gameResult})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jogos'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Desempenho'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderPerformanceChartOver25(teamStatsOver25) {
+    const ctxOver25 = document.getElementById('performanceChartOver25').getContext('2d');
+    const labelsOver25 = Array.from({ length: Math.max(...Object.values(teamStatsOver25).map(statsOver25 => statsOver25.performance.length)) }, (_, i) => i + 1);
+    const datasetsOver25 = [];
+
+    for (const teamOver25 in teamStatsOver25) {
+        const statsOver25 = teamStatsOver25[teamOver25];
+        datasetsOver25.push({
+            label: teamOver25,
+            data: statsOver25.performance,
+            fill: false,
+            borderColor: getRandomColor(),
+            tension: 0.1,
+            gameResultsOver25: statsOver25.results // Add game results to dataset
+        });
+    }
+
+    if (performanceChartOver25) {
+        performanceChartOver25.destroy();
+    }
+
+    performanceChartOver25 = new Chart(ctxOver25, {
+        type: 'line',
+        data: {
+            labels: labelsOver25,
+            datasets: datasetsOver25
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (contextOver25) {
+                            const datasetOver25 = contextOver25.dataset;
+                            const indexOver25 = contextOver25.dataIndex;
+                            const gameResultOver25 = datasetOver25.gameResultsOver25[indexOver25] || 'No game result';
+                            return `${contextOver25.dataset.label}: ${contextOver25.raw} (${gameResultOver25})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jogos'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Desempenho'
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
 function generateMaximasDeGols() {
     const data = document.getElementById('dataInput').value;
     const games = createGameArray(data);
@@ -217,4 +464,12 @@ function generateMaximasDeGols() {
     const invertedGameArray = invertGameArray(gameArray);
     const teamStats = calculateMaximasGols(invertedGameArray);
     displayMaximasGols(teamStats);
+
+    document.getElementById('performanceChart').style.display = 'block !important';
+    const performanceTrends = calculatePerformanceTrends(invertedGameArray);
+    renderPerformanceChart(performanceTrends);
+
+    // document.getElementById('performanceChartOver25').style.display = 'block !important';
+    // const performanceTrendsOver25 = calculatePerformanceTrendsOver25(invertedGameArray);
+    // renderPerformanceChartOver25(performanceTrendsOver25);
 }
