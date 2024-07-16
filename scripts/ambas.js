@@ -1,3 +1,5 @@
+let performanceChart;
+
 function sanitizeData(data) {
     return data.replace(/\+/g, '').trim();
 }
@@ -153,6 +155,115 @@ function toggleSort(tableId, column) {
     sortTable(tableId, column, newOrder);
 }
 
+function calculatePerformanceTrends(gameArray) {
+    const teamStats = {};
+
+    gameArray.forEach((row) => {
+        if (!Array.isArray(row)) return; // Verifica se row é um array
+
+        row.forEach((game) => {
+            if (game) {
+                const [teams, score] = game.split('\n');
+                const [team1, team2] = teams.split(' x ');
+                const [score1, score2] = score.split('-').map(Number);
+
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { performance: [], results: [] };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { performance: [], results: [] };
+                }
+
+                const team1LastPerformance = teamStats[team1].performance.slice(-1)[0] || 0;
+                const team2LastPerformance = teamStats[team2].performance.slice(-1)[0] || 0;
+
+                if (score1 > 0 && score2 > 0) {
+                    // Vitória do time 1
+                    teamStats[team1].performance.push(team1LastPerformance + 1);
+                    teamStats[team2].performance.push(team2LastPerformance + 1);
+                } else {
+                    teamStats[team2].performance.push(team2LastPerformance - 1);
+                    teamStats[team1].performance.push(team1LastPerformance - 1);
+                }
+
+                teamStats[team1].results.push(`${team1} ${score1}-${score2} ${team2}`);
+                teamStats[team2].results.push(`${team1} ${score1}-${score2} ${team2}`);
+            }
+        });
+    });
+
+    return teamStats;
+}
+
+function renderPerformanceChart(teamStats) {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
+    const datasets = [];
+
+    for (const team in teamStats) {
+        const stats = teamStats[team];
+        datasets.push({
+            label: team,
+            data: stats.performance,
+            fill: false,
+            borderColor: getRandomColor(),
+            tension: 0.1,
+            gameResults: stats.results // Add game results to dataset
+        });
+    }
+
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+
+    performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const dataset = context.dataset;
+                            const index = context.dataIndex;
+                            const gameResult = dataset.gameResults[index] || 'No game result';
+                            return `${context.dataset.label}: ${context.raw} (${gameResult})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jogos'
+                    }
+                },
+                y: {
+                    beginAtZero: false, // Permitir valores negativos
+                    title: {
+                        display: true,
+                        text: 'Desempenho'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 function generateMaximasDeTimes() {
     const data = document.getElementById('dataInput').value;
     const games = createGameArray(data);
@@ -160,4 +271,8 @@ function generateMaximasDeTimes() {
     const invertedGameArray = invertGameArray(gameArray);
     const teamStats = calculateMaximasAmbosMarcam(invertedGameArray);
     displayMaximas(teamStats);
+    
+    document.getElementById('performanceChart').style.display = 'block !important';
+    const performanceTrends = calculatePerformanceTrends(invertedGameArray);
+    renderPerformanceChart(performanceTrends);
 }
