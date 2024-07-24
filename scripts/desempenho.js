@@ -84,7 +84,10 @@ function renderPerformanceChart(teamStats) {
     const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
     const datasets = [];
 
-    for (const team in teamStats) {
+    // Obter os times e ordená-los em ordem alfabética
+    const teams = Object.keys(teamStats).sort();
+
+    teams.forEach(team => {
         const stats = teamStats[team];
         datasets.push({
             label: team,
@@ -92,9 +95,10 @@ function renderPerformanceChart(teamStats) {
             fill: false,
             borderColor: getRandomColor(),
             tension: 0.1,
-            gameResults: stats.results // Add game results to dataset
+            gameResults: stats.results, // Add game results to dataset
+            hidden: true // Initially hide all datasets
         });
-    }
+    });
 
     if (performanceChart) {
         performanceChart.destroy();
@@ -137,7 +141,19 @@ function renderPerformanceChart(teamStats) {
             }
         }
     });
+
+    // Create buttons for each team
+    const buttonsContainer = document.getElementById('teamButtons');
+    buttonsContainer.innerHTML = ''; // Clear existing buttons
+    teams.forEach(team => {
+        const button = document.createElement('button');
+        button.textContent = team;
+        button.addEventListener('click', () => toggleTeamVisibility(team));
+        buttonsContainer.appendChild(button);
+        teamButtons[team] = button;
+    });
 }
+
 
 function getRandomColor() {
     const letters = '0123456789ABCDEF';

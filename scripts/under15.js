@@ -34,84 +34,80 @@ function invertGameArray(gameArray) {
     return gameArray.map(row => row).reverse();
 }
 
-function calculateMaximasAmbosMarcam(gameArray) {
+function calculateMaximasUnder1_5(gameArray) {
     const teamStats = {};
 
     gameArray.forEach(row => {
         row.forEach(game => {
             if (game) {
-                // Corrigir a extração dos dados dos jogos
-                const matchData = game.match(/(.+?) x (.+?)\s(\d+)-(\d+)/);
-                if (matchData) {
-                    const [_, team1, team2, score1, score2] = matchData;
-                    const score1Num = parseInt(score1, 10);
-                    const score2Num = parseInt(score2, 10);
+                const [teams, score] = game.split(' ').join(' ').split(/\s(?=\d)/);
+                const [team1, team2] = teams.split(' x ');
+                const [score1, score2] = score.split('-').map(Number);
+                const totalGoals = score1 + score2;
 
-                    if (!teamStats[team1]) {
-                        teamStats[team1] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, totalBothTeamsScore: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0 };
-                    }
-                    if (!teamStats[team2]) {
-                        teamStats[team2] = { currentNoBothTeamsScore: 0, maxNoBothTeamsScore: 0, totalNoBothTeamsScore: 0, totalBothTeamsScore: 0, maxBothTeamsScore: 0, currentBothTeamsScore: 0 };
-                    }
+                if (!teamStats[team1]) {
+                    teamStats[team1] = { currentNoUnder: 0, maxNoUnder: 0, totalUnder: 0, gamesPlayed: 0, maxUnder: 0, currentUnder: 0 };
+                }
+                if (!teamStats[team2]) {
+                    teamStats[team2] = { currentNoUnder: 0, maxNoUnder: 0, totalUnder: 0, gamesPlayed: 0, maxUnder: 0, currentUnder: 0 };
+                }
 
-                    if (score1Num === 0 || score2Num === 0) {
-                        teamStats[team1].currentNoBothTeamsScore++;
-                        teamStats[team2].currentNoBothTeamsScore++;
-                        teamStats[team1].totalNoBothTeamsScore++;
-                        teamStats[team2].totalNoBothTeamsScore++;
-                        teamStats[team1].maxNoBothTeamsScore = Math.max(teamStats[team1].maxNoBothTeamsScore, teamStats[team1].currentNoBothTeamsScore);
-                        teamStats[team2].maxNoBothTeamsScore = Math.max(teamStats[team2].maxNoBothTeamsScore, teamStats[team2].currentNoBothTeamsScore);
+                teamStats[team1].gamesPlayed++;
+                teamStats[team2].gamesPlayed++;
 
-                        teamStats[team1].currentBothTeamsScore = 0;
-                        teamStats[team2].currentBothTeamsScore = 0;
-                    } else {
-                        teamStats[team1].currentBothTeamsScore++;
-                        teamStats[team2].currentBothTeamsScore++;
-                        teamStats[team1].totalBothTeamsScore++;
-                        teamStats[team2].totalBothTeamsScore++;
-                        teamStats[team1].maxBothTeamsScore = Math.max(teamStats[team1].maxBothTeamsScore, teamStats[team1].currentBothTeamsScore);
-                        teamStats[team2].maxBothTeamsScore = Math.max(teamStats[team2].maxBothTeamsScore, teamStats[team2].currentBothTeamsScore);
+                if (totalGoals <= 1.5) {
+                    teamStats[team1].currentUnder++;
+                    teamStats[team2].currentUnder++;
+                    teamStats[team1].totalUnder++;
+                    teamStats[team2].totalUnder++;
+                    teamStats[team1].maxUnder = Math.max(teamStats[team1].maxUnder, teamStats[team1].currentUnder);
+                    teamStats[team2].maxUnder = Math.max(teamStats[team2].maxUnder, teamStats[team2].currentUnder);
 
-                        teamStats[team1].currentNoBothTeamsScore = 0;
-                        teamStats[team2].currentNoBothTeamsScore = 0;
-                    }
+                    teamStats[team1].currentNoUnder = 0;
+                    teamStats[team2].currentNoUnder = 0;
                 } else {
-                    console.warn(`Formato de jogo inesperado: ${game}`);
+                    teamStats[team1].currentNoUnder++;
+                    teamStats[team2].currentNoUnder++;
+                    teamStats[team1].maxNoUnder = Math.max(teamStats[team1].maxNoUnder, teamStats[team1].currentNoUnder);
+                    teamStats[team2].maxNoUnder = Math.max(teamStats[team2].maxNoUnder, teamStats[team2].currentNoUnder);
+
+                    teamStats[team1].currentUnder = 0;
+                    teamStats[team2].currentUnder = 0;
                 }
             }
         });
     });
 
+    // Calcular a probabilidade de under 1.5
     for (const team in teamStats) {
         const stats = teamStats[team];
-        stats.paymentProbability = (
-            (stats.totalBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.5 +
-            (stats.currentNoBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.3 +
-            (stats.maxNoBothTeamsScore / (stats.totalNoBothTeamsScore + stats.totalBothTeamsScore)) * 0.2
+        stats.underProbability = (
+            (stats.totalUnder / stats.gamesPlayed) * 0.5 +
+            (stats.currentUnder / stats.gamesPlayed) * 0.3 +
+            (stats.maxUnder / stats.gamesPlayed) * 0.2
         ).toFixed(2);
     }
 
     return teamStats;
 }
 
-
 function displayMaximas(teamStats) {
     const maximasTableBody = document.getElementById('maximasTable').querySelector('tbody');
 
     maximasTableBody.innerHTML = ''; // Limpar o corpo da tabela de máximas
 
-    // Ordenar por currentNoBothTeamsScore de forma decrescente inicialmente
-    const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentNoBothTeamsScore - a.currentNoBothTeamsScore);
+    // Ordenar por currentNoDraw de forma decrescente inicialmente
+    const sortedTeamStats = Object.entries(teamStats).sort(([, a], [, b]) => b.currentNoDraw - a.currentNoDraw);
 
     sortedTeamStats.forEach(([team, stats]) => {
         // Adicionar à tabela de máximas
         const maximasRow = document.createElement('tr');
         maximasRow.innerHTML = `
             <td>${team}</td>
-            <td>${stats.currentNoBothTeamsScore}</td>
-            <td>${stats.maxNoBothTeamsScore}</td>
-            <td>${stats.totalBothTeamsScore}</td>
-            <td>${(stats.paymentProbability * 100).toFixed(2)}%</td>
+            <td>${stats.currentNoUnder}</td>
+            <td>${stats.maxNoUnder}</td>
+            <td>${stats.totalUnder}</td>
+            <td>${(stats.underProbability * 100).toFixed(2)}%</td>
         `;
         maximasTableBody.appendChild(maximasRow);
     });
@@ -172,6 +168,7 @@ function calculatePerformanceTrends(gameArray) {
                 const [teams, score] = game.split('\n');
                 const [team1, team2] = teams.split(' x ');
                 const [score1, score2] = score.split('-').map(Number);
+                const totalGoals = score1 + score2;
 
                 if (!teamStats[team1]) {
                     teamStats[team1] = { performance: [], results: [] };
@@ -183,8 +180,7 @@ function calculatePerformanceTrends(gameArray) {
                 const team1LastPerformance = teamStats[team1].performance.slice(-1)[0] || 0;
                 const team2LastPerformance = teamStats[team2].performance.slice(-1)[0] || 0;
 
-                if (score1 > 0 && score2 > 0) {
-                    // Vitória do time 1
+                if (totalGoals < 1.5) {
                     teamStats[team1].performance.push(team1LastPerformance + 1);
                     teamStats[team2].performance.push(team2LastPerformance + 1);
                 } else {
@@ -206,10 +202,7 @@ function renderPerformanceChart(teamStats) {
     const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
     const datasets = [];
 
-    // Obter os times e ordená-los em ordem alfabética
-    const teams = Object.keys(teamStats).sort();
-
-    teams.forEach(team => {
+    for (const team in teamStats) {
         const stats = teamStats[team];
         datasets.push({
             label: team,
@@ -217,10 +210,9 @@ function renderPerformanceChart(teamStats) {
             fill: false,
             borderColor: getRandomColor(),
             tension: 0.1,
-            gameResults: stats.results, // Add game results to dataset
-            hidden: true // Initially hide all datasets
+            gameResults: stats.results // Add game results to dataset
         });
-    });
+    }
 
     if (performanceChart) {
         performanceChart.destroy();
@@ -236,7 +228,7 @@ function renderPerformanceChart(teamStats) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             const dataset = context.dataset;
                             const index = context.dataIndex;
                             const gameResult = dataset.gameResults[index] || 'No game result';
@@ -263,17 +255,6 @@ function renderPerformanceChart(teamStats) {
             }
         }
     });
-
-    // Create buttons for each team
-    const buttonsContainer = document.getElementById('teamButtons');
-    buttonsContainer.innerHTML = ''; // Clear existing buttons
-    teams.forEach(team => {
-        const button = document.createElement('button');
-        button.textContent = team;
-        button.addEventListener('click', () => toggleTeamVisibility(team));
-        buttonsContainer.appendChild(button);
-        teamButtons[team] = button;
-    });
 }
 
 function getRandomColor() {
@@ -290,9 +271,9 @@ function generateMaximasDeTimes() {
     const games = createGameArray(data);
     const gameArray = organizeGamesInColumns(games, 20);
     const invertedGameArray = invertGameArray(gameArray);
-    const teamStats = calculateMaximasAmbosMarcam(invertedGameArray);
+    const teamStats = calculateMaximasUnder1_5(invertedGameArray);
     displayMaximas(teamStats);
-    
+
     document.getElementById('performanceChart').style.display = 'block !important';
     const performanceTrends = calculatePerformanceTrends(invertedGameArray);
     renderPerformanceChart(performanceTrends);

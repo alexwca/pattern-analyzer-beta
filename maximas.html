@@ -18,6 +18,7 @@
             <li><a href="ambas.html">Máximas de ambas marcam</a></li>
             <li><a href="maximas_gols.html">Máximas de Gols</a></li>
             <li><a href="desempenho.html">Gráfico de Desempenho</a></li>
+            <li><a href="under15.html">Máximas de Under 1.5</a></li>
         </ul>
     </nav>
     <h1>Máximas de Times</h1>
@@ -45,7 +46,7 @@
                                 </path>
                             </svg>
                         </button>
-                        Máxima atual
+                        Máxima atual sem vitoria
                     </th>
                     <th>
                         <button onclick="toggleSort('maximasTable', 2)" data-order="asc">
@@ -61,7 +62,7 @@
                                 </path>
                             </svg>
                         </button>
-                        Maior Máxima
+                        Maior Máxima se Vitoria
                     </th>
                     <th><button onclick="toggleSort('maximasTable', 3)" data-order="asc">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -119,9 +120,65 @@
                         </svg>
                     </button>
                     Empates</th>
+                    <th><button onclick="toggleSort('maximasTable', 7)" data-order="asc">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                            </path>
+                        </svg>
+                    </button>
+                    Atual sem Empates</th>
+                    <th><button onclick="toggleSort('maximasTable', 8)" data-order="asc">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                            </path>
+                        </svg>
+                    </button>
+                    Maxima sem Empates</th>
+                    <th><button onclick="toggleSort('maximasTable', 9)" data-order="asc">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                            </path>
+                        </svg>
+                    </button>
+                    Atual vitórias consecutivas</th>
+                    <th><button onclick="toggleSort('maximasTable', 10)" data-order="asc">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 6.293l-4.646 4.647-.708-.708L8 4.879l5.354 5.353-.708.708L8 6.293z"></path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z">
+                            </path>
+                        </svg>
+                    </button>
+                    Maxima de vitórias consecutivas</th>
 
                     
-                    <th><button onclick="toggleSort('maximasTable', 7)" data-order="asc">
+                    <th><button onclick="toggleSort('maximasTable', 11)" data-order="asc">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-chevron-up" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"

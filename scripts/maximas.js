@@ -43,49 +43,75 @@ function calculateMaximas(gameArray) {
                 const [score1, score2] = score.split('-').map(Number);
 
                 if (!teamStats[team1]) {
-                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [] };
+                    teamStats[team1] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [], currentWithoutDraw: 0, maxNoDrawStreak: 0, currentWinStreak: 0, maxWinStreak: 0 };
                 }
                 if (!teamStats[team2]) {
-                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [] };
+                    teamStats[team2] = { currentWithoutWin: 0, maxNoWinsStreak: 0, wins: 0, draws: 0, gamesPlayed: 0, losses: 0, recentForm: [], currentWithoutDraw: 0, maxNoDrawStreak: 0, currentWinStreak: 0, maxWinStreak: 0 };
                 }
 
                 teamStats[team1].gamesPlayed++;
                 teamStats[team2].gamesPlayed++;
 
                 if (score1 > score2) {
-                    // Team 1 wins, reset its current streak
+                    // Team 1 wins, reset its no-win streak and update win streak
                     teamStats[team1].currentWithoutWin = 0;
+                    teamStats[team1].currentWithoutDraw++;
+                    teamStats[team1].currentWinStreak++;
+                    if (teamStats[team1].currentWinStreak > teamStats[team1].maxWinStreak) {
+                        teamStats[team1].maxWinStreak = teamStats[team1].currentWinStreak;
+                    }
                     teamStats[team1].wins++;
                     teamStats[team1].recentForm.push('W');
                     if (teamStats[team1].recentForm.length > 5) teamStats[team1].recentForm.shift();
+
                     teamStats[team2].losses++;
                     teamStats[team2].recentForm.push('L');
                     if (teamStats[team2].recentForm.length > 5) teamStats[team2].recentForm.shift();
 
                     // Update Team 2
                     teamStats[team2].currentWithoutWin++;
+                    teamStats[team2].currentWithoutDraw++;
+                    teamStats[team2].currentWinStreak = 0;
                     if (teamStats[team2].currentWithoutWin > teamStats[team2].maxNoWinsStreak) {
                         teamStats[team2].maxNoWinsStreak = teamStats[team2].currentWithoutWin;
                     }
+                    if (teamStats[team2].currentWithoutDraw > teamStats[team2].maxNoDrawStreak) {
+                        teamStats[team2].maxNoDrawStreak = teamStats[team2].currentWithoutDraw;
+                    }
                 } else if (score2 > score1) {
-                    // Team 2 wins, reset its current streak
+                    // Team 2 wins, reset its no-win streak and update win streak
                     teamStats[team2].currentWithoutWin = 0;
+                    teamStats[team2].currentWithoutDraw++;
+                    teamStats[team2].currentWinStreak++;
+                    if (teamStats[team2].currentWinStreak > teamStats[team2].maxWinStreak) {
+                        teamStats[team2].maxWinStreak = teamStats[team2].currentWinStreak;
+                    }
                     teamStats[team2].wins++;
                     teamStats[team2].recentForm.push('W');
                     if (teamStats[team2].recentForm.length > 5) teamStats[team2].recentForm.shift();
+
                     teamStats[team1].losses++;
                     teamStats[team1].recentForm.push('L');
                     if (teamStats[team1].recentForm.length > 5) teamStats[team1].recentForm.shift();
 
                     // Update Team 1
                     teamStats[team1].currentWithoutWin++;
+                    teamStats[team1].currentWithoutDraw++;
+                    teamStats[team1].currentWinStreak = 0;
                     if (teamStats[team1].currentWithoutWin > teamStats[team1].maxNoWinsStreak) {
                         teamStats[team1].maxNoWinsStreak = teamStats[team1].currentWithoutWin;
+                    }
+                    if (teamStats[team1].currentWithoutDraw > teamStats[team1].maxNoDrawStreak) {
+                        teamStats[team1].maxNoDrawStreak = teamStats[team1].currentWithoutDraw;
                     }
                 } else {
                     // Draw, update both teams' streaks
                     teamStats[team1].currentWithoutWin++;
                     teamStats[team2].currentWithoutWin++;
+                    teamStats[team1].currentWithoutDraw = 0;
+                    teamStats[team2].currentWithoutDraw = 0;
+                    teamStats[team1].currentWinStreak = 0;
+                    teamStats[team2].currentWinStreak = 0;
                     teamStats[team1].draws++;
                     teamStats[team2].draws++;
                     teamStats[team1].recentForm.push('D');
@@ -147,6 +173,10 @@ function displayMaximas(teamStats) {
             <td style="text-align: center">${stats.wins} - <small>${(100 * (stats.wins / stats.gamesPlayed)).toFixed(2)}%</small></td>
             <td style="text-align: center">${stats.losses} - <small>${(100 * (stats.losses / stats.gamesPlayed)).toFixed(2)}%</small></td>
             <td style="text-align: center">${stats.draws} - <small>${(100 * (stats.draws / stats.gamesPlayed)).toFixed(2)}%</small></td>
+            <td style="text-align: center">${stats.currentWithoutDraw}</td>
+            <td style="text-align: center">${stats.maxNoDrawStreak}</td>
+            <td style="text-align: center">${stats.currentWinStreak}</td>
+            <td style="text-align: center">${stats.maxWinStreak}</td>
             <td style="text-align: center">${(100 * stats.winProbability).toFixed(2)}%</td>
         `;
         maximasTableBody.appendChild(maximasRow);

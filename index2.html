@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Máximas de Times - Ambas</title>
+    <title>análise de Tendências</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -13,19 +13,17 @@
 <body>
     <nav>
         <ul>
-            <li><a href="ranking.html">Ranking</a></li>
-            <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
-            <li><a href="maximas.html">Máximas de vitórias</a></li>
-            <li><a href="ambas.html">Máximas de ambas marcam</a></li>
-            <li><a href="maximas_gols.html">Máximas de Gols</a></li>
-            <li><a href="desempenho.html">Gráfico de Desempenho</a></li>
-            <li><a href="under15.html">Máximas de Under 1.5</a></li>
+            <li><button id="processRanking">Ranking</button></li>
+            <li><button id="processRankingNegatives">Ranking com Negativas</button></li>
+            <li><button id="processPerformance">Máximas de vitórias</button></li>
+            <li><button id="processBoth">Máximas de ambas marcam</button></li>
+            <li><button id="processOver25">Máximas de Gols</button></li>
         </ul>
     </nav>
-    <h1>Máximas de Ambas Marcam</h1>
+    <h1>CHABRAW TRENDS</h1>
     <textarea id="dataInput" rows="10" cols="50" placeholder="Insira os dados dos jogos para análise..."></textarea>
     <br>
-    <button onclick="generateMaximasDeTimes()">GERAR MÁXIMAS DE TIMES</button>
+    <button onclick="generateMaximasDeTimes()">GERAR ANÁLISE</button>
     <button onclick="clearData()">LIMPAR</button>
 
     <div style="display: flex; gap: 20px; justify-content: space-around;">
