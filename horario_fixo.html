@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Desempenho dos Times</title>
+    <title>Tabela de Médias</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
     <nav>
         <ul>
@@ -23,18 +19,20 @@
             <li><a href="horario_fixo.html">Horário Fixo</a></li>
         </ul>
     </nav>
-    <h1>Desempenho dos Times</h1>
-    <textarea id="dataInput" rows="10" cols="100"></textarea>
-    <br>
-    <button onclick="analyzeData()">Analisar Desempenho</button>
-    <button onclick="clearData()">LIMPAR</button>
-
-    <h3>Gráfico de Desempenho dos Times</h3>
-    <canvas id="performanceChart"></canvas>
-
-    <script src="scripts/desempenho.js"></script>
-    <script src="scripts/common.js"></script>
-
+    <div class="container">
+        <h1>Entrada de Dados</h1>
+        <textarea id="dataBlock1" placeholder="Insira os dados do Bloco 1 aqui"></textarea>
+        <textarea id="dataBlock2" placeholder="Insira os dados do Bloco 2 aqui"></textarea>
+        <select id="competition">
+            <option value="Copa">Copa</option>
+            <option value="Euro">Euro</option>
+            <option value="Super">Super</option>
+            <option value="Premier">Premier</option>
+        </select>
+        <button onclick="calcularMedia()">Calcular Média</button>
+        <h1>Tabela de Média</h1>
+        <table id="horario_fixo" style="width: 100%"></table>
+    </div>
+    <script src="scripts/horario_fixo.js"></script>
 </body>
-
 </html>

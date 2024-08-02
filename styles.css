@@ -51,7 +51,21 @@ button {
 }
 
 table {
-    margin: 20px 0;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    width: 5%;
 }
 
 table tr:nth-child(even) {
@@ -124,4 +138,39 @@ table tr:nth-child(even) {
 #performanceChart, #performanceChartOver25 {
     width: 100%;
     display: none;
+}
+
+#horario_fixo td, #horario_fixo th {
+    padding: 1px;
+    width: 5% !important;
+    font-size: 14px;
+}
+
+#horario_fixo  {
+    table-layout: fixed;
+}
+
+
+.red {
+    background-color: #ff5e57;
+    color: white;
+    text-align: center;
+}
+
+.orange {
+    background-color: #ffc048;
+    color: white;
+    text-align: center;
+}
+
+.blue {
+    background-color: #4bcffa;
+    color: white;
+    text-align: center;
+}
+
+.violet {
+    background-color: green;
+    color: white;
+    text-align: center;
 }
