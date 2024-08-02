@@ -81,8 +81,10 @@ function calcularMedia() {
                 cells[j].classList.add('red');
             } else if (media >= 40 && media < 70) {
                 cells[j].classList.add('orange');
-            } else if (media >= 70 && media < 90) {
+            } else if (media >= 70 && media < 80) {
                 cells[j].classList.add('blue');
+            }  else if (media >= 80 && media < 90) {
+                cells[j].classList.add('darkblue');
             } else if (media >= 90) {
                 cells[j].classList.add('violet');
             }

@@ -170,7 +170,13 @@ table tr:nth-child(even) {
 }
 
 .violet {
-    background-color: green;
+    background-color: #009432;
+    color: white;
+    text-align: center;
+}
+
+.darkblue {
+    background-color: #3742fa;
     color: white;
     text-align: center;
 }
