@@ -1,6 +1,4 @@
-
 let performanceChart;
-let performanceChartOver25;
 
 function sanitizeData(data) {
     return data.replace(/\+/g, '').trim();
@@ -257,79 +255,8 @@ function calculatePerformanceTrends(gameArray) {
     return teamStats;
 }
 
-
-
-function calculatePerformanceTrendsOver25(gameArray) {
-    const teamStatsOver25 = {};
-
-    gameArray.forEach((rowOver25) => {
-        if (!Array.isArray(rowOver25)) return; // Verifica se rowOver25 é um array
-
-        rowOver25.forEach((gameOver25) => {
-            if (gameOver25) {
-                const [teamsOver25, scoreOver25] = gameOver25.split('\n');
-                const [team1Over25, team2Over25] = teamsOver25.split(' x ');
-                const [score1Over25, score2Over25] = scoreOver25.split('-').map(Number);
-
-                if (!teamStatsOver25[team1Over25]) {
-                    teamStatsOver25[team1Over25] = { performance: [0], results: [] };
-                }
-                if (!teamStatsOver25[team2Over25]) {
-                    teamStatsOver25[team2Over25] = { performance: [0], results: [] };
-                }
-
-                const team1LastPerformanceOver25 = teamStatsOver25[team1Over25].performance.slice(-1)[0] || 0;
-                const team2LastPerformanceOver25 = teamStatsOver25[team2Over25].performance.slice(-1)[0] || 0;
-
-                const totalGoalsOver25 = score1Over25 + score2Over25;
-
-                if (score1Over25 > score2Over25) { // Team1 wins
-                    if (totalGoalsOver25 > 2.5) {
-                        // Vitória com over 2.5
-                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 + 2);
-                    } else {
-                        // Vitória com under 2.5
-                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 + 1);
-                    }
-                    // Derrota para Team2
-                    teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 - 1);
-                } else if (score2Over25 > score1Over25) { // Team2 wins
-                    if (totalGoalsOver25 > 2.5) {
-                        // Vitória com over 2.5
-                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 + 2);
-                    } else {
-                        // Vitória com under 2.5
-                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 + 1);
-                    }
-                    // Derrota para Team1
-                    teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 - 1);
-                } else { // Draw
-                    if (totalGoalsOver25 > 2.5) {
-                        // Empate com over 2.5 (sem alteração)
-                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25);
-                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25);
-                    } else {
-                        // Empate com under 2.5
-                        teamStatsOver25[team1Over25].performance.push(team1LastPerformanceOver25 - 1);
-                        teamStatsOver25[team2Over25].performance.push(team2LastPerformanceOver25 - 1);
-                    }
-                }
-
-                teamStatsOver25[team1Over25].results.push(`${team1Over25} ${score1Over25}-${score2Over25} ${team2Over25}`);
-                teamStatsOver25[team2Over25].results.push(`${team1Over25} ${score1Over25}-${score2Over25} ${team2Over25}`);
-            }
-        });
-    });
-
-    return teamStatsOver25;
-}
-
-
-
-
-
-function renderPerformanceChart(teamStats) {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
+function renderPerformanceChart(teamStats, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
     const labels = Array.from({ length: Math.max(...Object.values(teamStats).map(stats => stats.performance.length)) }, (_, i) => i + 1);
     const datasets = [];
 
@@ -387,66 +314,6 @@ function renderPerformanceChart(teamStats) {
     });
 }
 
-function renderPerformanceChartOver25(teamStatsOver25) {
-    const ctxOver25 = document.getElementById('performanceChartOver25').getContext('2d');
-    const labelsOver25 = Array.from({ length: Math.max(...Object.values(teamStatsOver25).map(statsOver25 => statsOver25.performance.length)) }, (_, i) => i + 1);
-    const datasetsOver25 = [];
-
-    for (const teamOver25 in teamStatsOver25) {
-        const statsOver25 = teamStatsOver25[teamOver25];
-        datasetsOver25.push({
-            label: teamOver25,
-            data: statsOver25.performance,
-            fill: false,
-            borderColor: getRandomColor(),
-            tension: 0.1,
-            gameResultsOver25: statsOver25.results // Add game results to dataset
-        });
-    }
-
-    if (performanceChartOver25) {
-        performanceChartOver25.destroy();
-    }
-
-    performanceChartOver25 = new Chart(ctxOver25, {
-        type: 'line',
-        data: {
-            labels: labelsOver25,
-            datasets: datasetsOver25
-        },
-        options: {
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (contextOver25) {
-                            const datasetOver25 = contextOver25.dataset;
-                            const indexOver25 = contextOver25.dataIndex;
-                            const gameResultOver25 = datasetOver25.gameResultsOver25[indexOver25] || 'No game result';
-                            return `${contextOver25.dataset.label}: ${contextOver25.raw} (${gameResultOver25})`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Jogos'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Desempenho'
-                    }
-                }
-            }
-        }
-    });
-}
-
-
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -456,7 +323,6 @@ function getRandomColor() {
     return color;
 }
 
-
 function generateMaximasDeGols() {
     const data = document.getElementById('dataInput').value;
     const games = createGameArray(data);
@@ -465,11 +331,6 @@ function generateMaximasDeGols() {
     const teamStats = calculateMaximasGols(invertedGameArray);
     displayMaximasGols(teamStats);
 
-    document.getElementById('performanceChart').style.display = 'block !important';
     const performanceTrends = calculatePerformanceTrends(invertedGameArray);
-    renderPerformanceChart(performanceTrends);
-
-    // document.getElementById('performanceChartOver25').style.display = 'block !important';
-    // const performanceTrendsOver25 = calculatePerformanceTrendsOver25(invertedGameArray);
-    // renderPerformanceChartOver25(performanceTrendsOver25);
+    renderPerformanceChart(performanceTrends, 'performanceChart');
 }
