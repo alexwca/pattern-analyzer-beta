@@ -201,7 +201,30 @@ function toggleSortByPercentage() {
         results.sort(customSort);
     }
     displayResults(results);
+    updateNegativesAfterSort();
 }
+
+function updateNegativesAfterSort() {
+    const negativeInput = document.getElementById('negativeInput').value.replace(/['"]+/g, '').replace(/\+/g, '').trim();
+    const negativeGames = negativeInput.split(/\t|\n/).filter(line => line.trim() !== '');
+    const negativeMatches = [];
+
+    for (let i = 0; i < negativeGames.length; i += 2) {
+        if (i + 1 < negativeGames.length) {
+            const teams = negativeGames[i].trim();
+            const score = negativeGames[i + 1].trim();
+            if (teams && score) {
+                negativeMatches.push({ teams, score });
+            }
+        }
+    }
+
+    // Recalcular as negativas usando os novos top 5 times
+    const topTeams = results.slice(0, 5).map(result => result.team);
+    createNegativeMatchTable(negativeMatches.slice(0, 20), 'matchTable', topTeams);
+    validateTopTeams(results, negativeMatches);
+}
+
 
 function displayResults(results) {
     const tbody = document.getElementById('resultsTable').querySelector('tbody');
@@ -220,3 +243,5 @@ function displayResults(results) {
         document.getElementById('resultsTable').style.display = 'block';
     });
 }
+
+
