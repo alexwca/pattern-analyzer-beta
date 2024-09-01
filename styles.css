@@ -146,10 +146,19 @@ table tr:nth-child(even) {
     font-size: 14px;
 }
 
-#horario_fixo  {
+table[id^="horario_fixo"] {
     table-layout: fixed;
 }
 
+/* Sobrescrevendo a regra para a tabela mesclada */
+#horario_fixo_mesclado tr:nth-child(even) {
+    background-color: transparent; /* Remove o fundo das linhas pares */
+}
+
+/* Mantém o fundo para as linhas em branco específicas na tabela mesclada */
+#horario_fixo_mesclado .blank-row td {
+    background-color: #dbdbdb;
+}
 
 .red {
     background-color: #ff5e57;
@@ -179,4 +188,8 @@ table tr:nth-child(even) {
     background-color: #3742fa;
     color: white;
     text-align: center;
+}
+
+.hidden {
+    display: none;
 }
