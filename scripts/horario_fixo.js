@@ -106,8 +106,7 @@ function mesclarTabelas(tableId1, tableId2, tableIdMesclado) {
     const rows2 = table2.rows;
 
     // Inicia a mesclagem das tabelas, linha por linha
-    for (let i = 1; i < rows1.length; i++) { // Pula a linha do cabeçalho
-        // Adiciona linha da primeira tabela
+    for (let i = 1; i < rows1.length; i++) { 
         let row1 = resultTable.insertRow();
         for (let j = 0; j < rows1[i].cells.length; j++) {
             const cell = row1.insertCell();
@@ -115,7 +114,6 @@ function mesclarTabelas(tableId1, tableId2, tableIdMesclado) {
             cell.className = rows1[i].cells[j].className;
         }
 
-        // Adiciona linha da segunda tabela
         let row2 = resultTable.insertRow();
         for (let j = 0; j < rows2[i].cells.length; j++) {
             const cell = row2.insertCell();
@@ -123,12 +121,18 @@ function mesclarTabelas(tableId1, tableId2, tableIdMesclado) {
             cell.className = rows2[i].cells[j].className;
         }
 
-        // Adiciona uma linha em branco com a classe 'blank-row'
         let blankRow = resultTable.insertRow();
         blankRow.className = 'blank-row';
         blankRow.insertCell().innerText = '';
         for (let j = 1; j < rows1[i].cells.length; j++) {
             blankRow.insertCell();
+        }
+
+        let blankRow2 = resultTable.insertRow();
+        blankRow2.className = 'blank-row';
+        blankRow2.insertCell().innerText = '';
+        for (let j = 1; j < rows1[i].cells.length; j++) {
+            blankRow2.insertCell();
         }
     }
 }
