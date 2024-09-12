@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Contagem Gráfica</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .green {
+            background-color: #98FB98;
+            /* Verde claro */
+        }
+
+        .red {
+            background-color: #FF7F7F;
+            /* Vermelho claro */
+        }
+
+        @media (max-width: 768px) {
+
+            td,
+            th {
+                font-size: 12px;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Contagem Gráfica</h1>
+
+    <!-- Select para escolher o campeonato -->
+    <label for="selectCampeonato">Escolha o Campeonato:</label>
+    <select id="selectCampeonato">
+        <option value="copa">Copa</option>
+        <option value="euro">Euro</option>
+        <option value="super">Super</option>
+        <option value="premier">Premier</option>
+    </select><br><br>
+
+    <!-- Select para escolher o mercado -->
+    <label for="selectMercado">Escolha o Mercado:</label>
+    <select id="selectMercado">
+        <option value="ambas">Ambas Sim</option>
+        <option value="over25">Over 2.5</option>
+    </select><br><br>
+
+    <!-- Textarea para entrada de dados -->
+    <textarea id="dataInput" rows="12" cols="100" placeholder="Insira os dados aqui. Com a hora da linha e sem os times."></textarea><br><br>
+
+    <!-- Botão para gerar a tabela e gráficos -->
+    <button onclick="gerarTabelaEGraficos()">Gerar Tabela e Gráficos</button>
+
+
+    
+    <!-- Div para exibir o gráfico de oscilações acumuladas -->
+    <h2>Gráfico</h2>
+    
+    <div id="graficoContagemAcumulada"></div>
+    <!-- Tabela para exibir os resultados -->
+    <h2>Tabela de Jogos</h2>
+    <table id="horario_fixo"></table>
+
+    <!-- Div para exibir o gráfico de oscilações linha a linha -->
+    <h2>Gráfico de Contagens Linha a Linha</h2>
+    <div id="graficoContagemLinha"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="scripts/contagem_grafica.js"></script>
+</body>
+
+</html>
