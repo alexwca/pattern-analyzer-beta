@@ -102,6 +102,16 @@ function gerarTabelaEGraficos() {
             if (!result) return false;
             const [time1, time2] = result.split('-').map(Number);
             return time1 === time2;
+        },
+        casanao: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 === 0;
+        },
+        visitantenao: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time2 === 0;
         }
         // Adicione mais opções de mercado conforme necessário
     };
@@ -125,6 +135,10 @@ function gerarTabelaEGraficos() {
                 return mercados.visitante(result);
             case 'empate':
                 return mercados.empate(result);
+            case 'casanao':
+                return mercados.casanao(result);
+            case 'visitantenao':
+                return mercados.visitantenao(result);
             default:
                 return false; // Valor de fallback para evitar erros
         }
