@@ -62,7 +62,7 @@ function gerarTabelaEGraficos() {
     let comparacoesResultados = []; // Array para armazenar os resultados comparados
 
     const mercados = {
-        
+
         under15: result => {
             if (!result) return false;
             const [time1, time2] = result.split('-').map(Number);
@@ -83,6 +83,11 @@ function gerarTabelaEGraficos() {
             const [time1, time2] = result.split('-').map(Number);
             return time1 + time2 > 3.5;
         },
+        over5: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 + time2 >= 5;
+        },
         empate: result => {
             if (!result) return false;
             const [time1, time2] = result.split('-').map(Number);
@@ -102,6 +107,8 @@ function gerarTabelaEGraficos() {
                 return mercados.over25(result);
             case 'over35':
                 return mercados.over35(result);
+            case 'over5':
+                return mercados.over5(result);
             case 'empate':
                 return mercados.empate(result);
             default:
@@ -109,8 +116,8 @@ function gerarTabelaEGraficos() {
         }
     }
 
-     // Mapeia os dados para os valores de mercado selecionados
-     const resultadoMercado = mosaico.map(row => 
+    // Mapeia os dados para os valores de mercado selecionados
+    const resultadoMercado = mosaico.map(row =>
         row.map(result => verificarMercado(mercado, result))
     );
 
@@ -211,7 +218,7 @@ function gerarTabelaEGraficos() {
                 }
                 valorOscilacao += isPositiveMarket ? 1 : -1;
             }
-            
+
             // Armazenar a oscilação e a hora/minuto do ponto
             oscilacaoAcumulada.push(valorOscilacao);
             dadosGrafico.push({
@@ -249,7 +256,7 @@ function gerarTabelaEGraficos() {
         },
         stroke: { width: 1 },
         series: [{ name: 'Oscilação Acumulada', data: oscilacaoAcumulada }],
-        xaxis: { 
+        xaxis: {
             categories: dadosGrafico.map(d => `${d.hora}:${d.minuto < 10 ? '0' + d.minuto : d.minuto}`),  // Formatar a hora e o minuto
             tickAmount: Math.min(dadosGrafico.length, 10)  // Mostrar apenas algumas labels para não sobrecarregar
         },
@@ -265,7 +272,7 @@ function gerarTabelaEGraficos() {
             ]
         },
         tooltip: {
-            custom: function({ dataPointIndex }) {
+            custom: function ({ dataPointIndex }) {
                 const { hora, minuto } = dadosGrafico[dataPointIndex];
                 const { current, previous } = comparacoesResultados[dataPointIndex];
                 return `<div style="padding:5px;"><strong>Hora:</strong> ${hora}:${minuto < 10 ? '0' + minuto : minuto}<br><strong>Operacional:</strong> ${current || "N/A"}<br><strong>Comparativa:</strong> ${previous || "N/A"}</div>`;
@@ -355,7 +362,7 @@ function gerarGraficosCombinados() {
             width: [2, 2, 2, 2], // Largura das linhas de cada série
             curve: 'straight' // linhas - stepline, smooth, straight
         },
-        colors: ['#00FF00', '#FF0000',  '#0000FF' , '#FFFF00'], // Exemplo com vermelho, verde, azul e amarelo
+        colors: ['#00FF00', '#FF0000', '#0000FF', '#FFFF00'], // Exemplo com vermelho, verde, azul e amarelo
         series: [
             {
                 name: 'Subidas',
