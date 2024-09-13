@@ -63,8 +63,11 @@
     <!-- Select para escolher o mercado -->
     <label for="selectMercado">Escolha o Mercado:</label>
     <select id="selectMercado">
+        <option value="under15">Under 1.5</option>
         <option value="ambas">Ambas Sim</option>
         <option value="over25">Over 2.5</option>
+        <option value="over35">Over 3.5</option>
+        <option value="empate">Empate</option>
     </select><br><br>
 
     <!-- Textarea para entrada de dados -->
@@ -72,8 +75,6 @@
 
     <!-- Botão para gerar a tabela e gráficos -->
     <button onclick="gerarTabelaEGraficos()">Gerar Tabela e Gráficos</button>
-
-
     
     <!-- Div para exibir o gráfico de oscilações acumuladas -->
     <h2>Gráfico</h2>

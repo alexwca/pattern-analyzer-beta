@@ -61,23 +61,57 @@ function gerarTabelaEGraficos() {
     let valorOscilacao = 0;
     let comparacoesResultados = []; // Array para armazenar os resultados comparados
 
-    // Função para verificar se o resultado é "Ambas Times Marcam"
-    const ambasTimesMarcam = result => {
-        if (!result) return false;
-        const [time1, time2] = result.split('-').map(Number);
-        return time1 > 0 && time2 > 0;
+    const mercados = {
+        
+        under15: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 + time2 < 1.5;
+        },
+        ambasTimesMarcam: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 > 0 && time2 > 0;
+        },
+        over25: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 + time2 > 2.5;
+        },
+        over35: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 + time2 > 3.5;
+        },
+        empate: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 === time2;
+        }
+        // Adicione mais opções de mercado conforme necessário
     };
 
-    // Função para verificar se o resultado é "Over 2.5"
-    const over25 = result => {
-        if (!result) return false;
-        const [time1, time2] = result.split('-').map(Number);
-        return time1 + time2 > 2.5;
-    };
+    // Função para escolher a verificação do mercado com base na seleção
+    function verificarMercado(mercado, result) {
+        switch (mercado) {
+            case 'under15':
+                return mercados.under15(result);
+            case 'ambas':
+                return mercados.ambasTimesMarcam(result);
+            case 'over25':
+                return mercados.over25(result);
+            case 'over35':
+                return mercados.over35(result);
+            case 'empate':
+                return mercados.empate(result);
+            default:
+                return false; // Valor de fallback para evitar erros
+        }
+    }
 
-    // Mapeia os dados para os valores de mercado selecionados
-    const resultadoMercado = mosaico.map(row => 
-        row.map(result => mercado === 'ambas' ? ambasTimesMarcam(result) : over25(result))
+     // Mapeia os dados para os valores de mercado selecionados
+     const resultadoMercado = mosaico.map(row => 
+        row.map(result => verificarMercado(mercado, result))
     );
 
     // Apresentar os dados na tabela conforme foram inseridos (de cima para baixo)

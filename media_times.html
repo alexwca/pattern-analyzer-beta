@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Médias</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="ranking.html">Ranking</a></li>
+            <li><a href="rankingWithNegatives.html">Ranking com Negativas</a></li>
+            <li><a href="maximas.html">Máximas de vitórias</a></li>
+            <li><a href="ambas.html">Máximas de ambas marcam</a></li>
+            <li><a href="maximas_gols.html">Máximas de Gols</a></li>
+            <li><a href="desempenho.html">Gráfico de Desempenho</a></li>
+            <li><a href="under15.html">Máximas de Under 1.5</a></li>
+            <li><a href="horario_fixo.html">Horário Fixo</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Entrada de Dados</h1>
+        <textarea id="dataBlock1" placeholder="Insira os dados do Bloco 1 aqui"></textarea>
+        <textarea id="dataBlock2" placeholder="Insira os dados do Bloco 2 aqui"></textarea>
+        <select id="competition">
+            <option value="Copa">Copa</option>
+            <option value="Euro">Euro</option>
+            <option value="Super">Super</option>
+            <option value="Premier">Premier</option>
+        </select>
+        <button onclick="calcularMedia()">Calcular Média</button>
+        <h1>Tabela de Média</h1>
+        <table id="horario_fixo" style="width: 100%"></table>
+    </div>
+    <script src="scripts/media_times.js"></script>
+</body>
+
+</html>
