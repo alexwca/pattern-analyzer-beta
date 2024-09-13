@@ -84,7 +84,7 @@ function gerarTabelaEGraficos() {
     mosaico.forEach((row, rowIndex) => {
         const tableRow = document.createElement('tr');
         const hourCell = document.createElement('td');
-        hourCell.innerText = `Hora ${row[0]}`;
+        hourCell.innerText = `${row[0]}`;
         tableRow.appendChild(hourCell);
 
         let subidas = 0, descidas = 0, lateralSimOver = 0, lateralNaoUnder = 0;
