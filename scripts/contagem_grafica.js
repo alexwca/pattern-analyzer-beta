@@ -88,6 +88,16 @@ function gerarTabelaEGraficos() {
             const [time1, time2] = result.split('-').map(Number);
             return time1 + time2 >= 5;
         },
+        casa: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 > time2;
+        },
+        visitante: result => {
+            if (!result) return false;
+            const [time1, time2] = result.split('-').map(Number);
+            return time1 < time2;
+        },
         empate: result => {
             if (!result) return false;
             const [time1, time2] = result.split('-').map(Number);
@@ -109,6 +119,10 @@ function gerarTabelaEGraficos() {
                 return mercados.over35(result);
             case 'over5':
                 return mercados.over5(result);
+            case 'casa':
+                return mercados.casa(result);
+            case 'visitante':
+                return mercados.visitante(result);
             case 'empate':
                 return mercados.empate(result);
             default:
