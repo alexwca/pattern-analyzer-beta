@@ -117,32 +117,37 @@ function gerarTabelaEGraficos() {
     };
 
     // Função para escolher a verificação do mercado com base na seleção
+    // Função para verificar o mercado
     function verificarMercado(mercado, result) {
+        if (!result) return false;
+        const [time1, time2] = result.split('-').map(Number);
+
         switch (mercado) {
             case 'under15':
-                return mercados.under15(result);
+                return time1 + time2 < 1.5;
             case 'ambas':
-                return mercados.ambasTimesMarcam(result);
+                return time1 > 0 && time2 > 0;
             case 'over25':
-                return mercados.over25(result);
+                return time1 + time2 > 2.5;
             case 'over35':
-                return mercados.over35(result);
+                return time1 + time2 > 3.5;
             case 'over5':
-                return mercados.over5(result);
+                return time1 + time2 >= 5;
             case 'casa':
-                return mercados.casa(result);
+                return time1 > time2;
             case 'visitante':
-                return mercados.visitante(result);
+                return time1 < time2;
             case 'empate':
-                return mercados.empate(result);
+                return time1 === time2;
             case 'casanao':
-                return mercados.casanao(result);
+                return time1 === 0;
             case 'visitantenao':
-                return mercados.visitantenao(result);
+                return time2 === 0;
             default:
-                return false; // Valor de fallback para evitar erros
+                return false;
         }
     }
+
 
     // Mapeia os dados para os valores de mercado selecionados
     const resultadoMercado = mosaico.map(row =>
@@ -206,6 +211,8 @@ function gerarTabelaEGraficos() {
         table.appendChild(tableRow);
     });
 
+    let acumuladoMercado = 0;
+
     // Comparação das linhas de baixo para cima (para o gráfico)
     for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
         const currentRow = mosaico[rowIndex];
@@ -252,7 +259,8 @@ function gerarTabelaEGraficos() {
             dadosGrafico.push({
                 oscilacao: valorOscilacao,
                 hora: currentRow[0],  // Hora do jogo atual
-                minuto: minutos[i - 1]  // Minuto do jogo específico
+                minuto: minutos[i - 1],  // Minuto do jogo específico
+                ocorrenciasMercado: acumuladoMercado  // Quantas vezes o mercado ocorreu até o ponto atual
             });
 
             // Armazenar os resultados comparados
@@ -301,9 +309,14 @@ function gerarTabelaEGraficos() {
         },
         tooltip: {
             custom: function ({ dataPointIndex }) {
-                const { hora, minuto } = dadosGrafico[dataPointIndex];
+                const { hora, minuto, oscilacao } = dadosGrafico[dataPointIndex];
                 const { current, previous } = comparacoesResultados[dataPointIndex];
-                return `<div style="padding:5px;"><strong>Hora:</strong> ${hora}:${minuto < 10 ? '0' + minuto : minuto}<br><strong>Operacional:</strong> ${current || "N/A"}<br><strong>Comparativa:</strong> ${previous || "N/A"}</div>`;
+                return `<div style="padding:5px;">
+                            <strong>Hora:</strong> ${hora}:${minuto < 10 ? '0' + minuto : minuto}<br>
+                            <strong>Operacional:</strong> ${current || "N/A"}<br>
+                            <strong>Comparativa:</strong> ${previous || "N/A"}<br>
+                            <strong>Ponto no gráfico:</strong> ${oscilacao}<br>
+                        </div>`;
             }
         }
     };
@@ -311,18 +324,19 @@ function gerarTabelaEGraficos() {
     chartAcumulada = new ApexCharts(document.querySelector("#graficoContagemAcumulada"), optionsAcumulada);
     chartAcumulada.render();
 
-    gerarGraficosCombinados();
+    gerarGraficosCombinados(mosaico);
 }
 
 
 
-function gerarGraficosCombinados() {
+function gerarGraficosCombinados(mosaico) {
     // Arrays para armazenar as contagens de subidas, descidas e lateralizações
     let subidasArray = [];
     let descidasArray = [];
     let lateralSimOverArray = [];
     let lateralNaoUnderArray = [];
     let horaMinutoLabels = [];
+
 
     // Percorrer a matriz de cima para baixo (última linha para a primeira)
     for (let rowIndex = 0; rowIndex < mosaico.length - 1; rowIndex++) {
@@ -363,6 +377,7 @@ function gerarGraficosCombinados() {
         // Adicionar a label da hora correspondente
         horaMinutoLabels.push(`Hora ${currentRow[0]}`);
     }
+
 
     // **INVERTER** as contagens e as labels para leitura correta de baixo para cima
     subidasArray.reverse();
