@@ -307,6 +307,15 @@ function gerarTabelaEGraficos() {
                 { x: minIndex, y: minValor, marker: { size: 6 }, label: { text: `Mínimo: ${minValor}` } }
             ]
         },
+        markers: {
+            size: 3,  // Tamanho dos pontos no gráfico
+            colors: ['#fff'],  // Cor dos pontos
+            strokeColors: '#2980b9',  // Cor da borda do ponto
+            strokeWidth: 1,  // Largura da borda do ponto
+            hover: {
+                size: 6  // Tamanho do ponto ao passar o mouse
+            }
+        },
         tooltip: {
             custom: function ({ dataPointIndex }) {
                 const { hora, minuto, oscilacao } = dadosGrafico[dataPointIndex];
