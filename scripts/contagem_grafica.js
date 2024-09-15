@@ -287,7 +287,7 @@ function gerarTabelaEGraficos() {
         chart: {
             type: 'line',
             height: 350,
-            zoom: { enabled: true },
+            zoom: { enabled: false },
             toolbar: { tools: { pan: true, zoom: false } }
         },
         stroke: { width: 1 },
