@@ -308,7 +308,7 @@ function gerarTabelaEGraficos() {
             ]
         },
         markers: {
-            size: 3,  // Tamanho dos pontos no gráfico
+            size: 1.7,  // Tamanho dos pontos no gráfico
             colors: ['#fff'],  // Cor dos pontos
             strokeColors: '#2980b9',  // Cor da borda do ponto
             strokeWidth: 1,  // Largura da borda do ponto
