@@ -167,44 +167,53 @@ function gerarTabelaEGraficos() {
             const cell = document.createElement('td');
             cell.innerText = row[i] || '';  // Preencher vazio se o dado estiver faltando
 
-            // Coloração conforme o mercado
+            // Verifique se o resultado não está vazio antes de colorir e contar
             const isPositiveMarket = resultadoMercado[rowIndex][i];
-            cell.classList.add(isPositiveMarket ? 'green' : 'red');
-            tableRow.appendChild(cell);
-
-            // Atualizar contagens
             const nextRow = mosaico[rowIndex + 1] || [];
             const isPositiveNextMarket = resultadoMercado[rowIndex + 1] ? resultadoMercado[rowIndex + 1][i] : null;
 
-            if (isPositiveMarket === isPositiveNextMarket) {
-                if (isPositiveMarket) {
-                    lateralSimOver++;
+            if (row[i]) {  // Verifica se o valor atual existe
+                cell.classList.add(isPositiveMarket ? 'green' : 'red');
+            }
+
+            tableRow.appendChild(cell);
+
+            // Continuar a contagem apenas se os resultados existirem para a linha atual e a próxima
+            if (row[i] && nextRow[i]) {
+                if (isPositiveMarket === isPositiveNextMarket) {
+                    if (isPositiveMarket) {
+                        lateralSimOver++;
+                    } else {
+                        lateralNaoUnder++;
+                    }
                 } else {
-                    lateralNaoUnder++;
-                }
-            } else {
-                if (isPositiveMarket) {
-                    subidas++;
-                } else {
-                    descidas++;
+                    if (isPositiveMarket) {
+                        subidas++;
+                    } else {
+                        descidas++;
+                    }
                 }
             }
         }
 
         // Adicionar colunas com as contagens (subidas, descidas, lateralizações)
         const subidasCell = document.createElement('td');
+        subidasCell.title = "Subidas"
         subidasCell.innerText = subidas;
         tableRow.appendChild(subidasCell);
 
         const lateralSimOverCell = document.createElement('td');
+        lateralSimOverCell.title = "Lateralizações Green"
         lateralSimOverCell.innerText = lateralSimOver;
         tableRow.appendChild(lateralSimOverCell);
 
         const descidasCell = document.createElement('td');
+        descidasCell.title = "Quedas"
         descidasCell.innerText = descidas;
         tableRow.appendChild(descidasCell);
 
         const lateralNaoUnderCell = document.createElement('td');
+        lateralNaoUnderCell.title = "Lateralizações Red"
         lateralNaoUnderCell.innerText = lateralNaoUnder;
         tableRow.appendChild(lateralNaoUnderCell);
 
