@@ -293,8 +293,8 @@ function gerarTabelaEGraficos() {
         stroke: { width: 1 },
         series: [{ name: 'Oscilação Acumulada', data: oscilacaoAcumulada }],
         xaxis: {
-            categories: dadosGrafico.map(d => `${d.hora}:${d.minuto < 10 ? '0' + d.minuto : d.minuto}`),  // Formatar a hora e o minuto
-            tickAmount: Math.min(dadosGrafico.length, 10)  // Mostrar apenas algumas labels para não sobrecarregar
+            categories: dadosGrafico.map(d => `${d.hora < 10 ? '0' + d.hora : d.hora}:${d.minuto < 10 ? '0' + d.minuto : d.minuto}`),  // Formatar a hora e o minuto
+            tickAmount: Math.min(dadosGrafico.length, 80)  // Mostrar apenas algumas labels para não sobrecarregar
         },
         yaxis: { title: { text: 'Oscilação' } },
         annotations: {
