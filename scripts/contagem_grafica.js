@@ -47,7 +47,7 @@ function gerarTabelaEGraficos() {
     });
 
     // Adicionar colunas com ícones
-    const icones = ['⬆️', '⬇️', '↔️', '⇆'];
+    const icones = ['⬆️', '↔️', '⬇️', '⇆'];
     icones.forEach(icone => {
         const th = document.createElement('th');
         th.innerText = icone;
@@ -196,13 +196,13 @@ function gerarTabelaEGraficos() {
         subidasCell.innerText = subidas;
         tableRow.appendChild(subidasCell);
 
-        const descidasCell = document.createElement('td');
-        descidasCell.innerText = descidas;
-        tableRow.appendChild(descidasCell);
-
         const lateralSimOverCell = document.createElement('td');
         lateralSimOverCell.innerText = lateralSimOver;
         tableRow.appendChild(lateralSimOverCell);
+
+        const descidasCell = document.createElement('td');
+        descidasCell.innerText = descidas;
+        tableRow.appendChild(descidasCell);
 
         const lateralNaoUnderCell = document.createElement('td');
         lateralNaoUnderCell.innerText = lateralNaoUnder;
