@@ -47,7 +47,7 @@ function gerarTabelaEGraficos() {
     });
 
     // Adicionar colunas com ícones
-    const icones = ['⬆️', '↔️', '⬇️', '⇆', '⚽'];
+    const icones = ['％', '⬆️', '↔️', '⬇️', '⇆', '⚽'];
     icones.forEach(icone => {
         const th = document.createElement('th');
         th.innerText = icone;
@@ -161,7 +161,7 @@ function gerarTabelaEGraficos() {
         hourCell.innerText = `${row[0]}`;
         tableRow.appendChild(hourCell);
 
-        let subidas = 0, descidas = 0, lateralSimOver = 0, lateralNaoUnder = 0, totalGols = 0;
+        let subidas = 0, descidas = 0, lateralSimOver = 0, lateralNaoUnder = 0, totalGols = 0, totalJogos = 0;
 
         for (let i = 1; i <= minutos.length; i++) {
             const cell = document.createElement('td');
@@ -174,6 +174,8 @@ function gerarTabelaEGraficos() {
 
             if (row[i]) {  // Verifica se o valor atual existe
                 cell.classList.add(isPositiveMarket ? 'green' : 'red');
+
+                totalJogos++;
 
                 const [time1, time2] = row[i].split('-').map(Number);
                 totalGols += (time1 + time2);
@@ -197,9 +199,16 @@ function gerarTabelaEGraficos() {
                     }
                 }
             }
+
+
         }
 
         // Adicionar colunas com as contagens (subidas, descidas, lateralizações)
+        const porcentagem = document.createElement('td');
+        porcentagem.title = "Porcentagem"
+        porcentagem.innerText = `${((subidas + lateralSimOver) / totalJogos * 100).toFixed(0)}%`;
+        tableRow.appendChild(porcentagem);
+
         const subidasCell = document.createElement('td');
         subidasCell.title = "Subidas"
         subidasCell.innerText = subidas;
