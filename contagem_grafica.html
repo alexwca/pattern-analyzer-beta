@@ -7,6 +7,13 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Contagem Gráfica</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -29,7 +36,7 @@
 
         table th,
         table td {
-            padding: 8px;
+            padding: 2px;
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -43,6 +50,10 @@
             box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
         }
 
+        textarea {
+            padding: 10px;
+        }
+
         .green {
             background-color: #98FB98;
         }
@@ -51,12 +62,15 @@
             background-color: #FF7F7F;
         }
 
-        
+        .title {
+            margin: 15px 0;
+            padding: 15px 0;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Contagem Gráfica</h1>
+    <h1 class="title">Contagem Gráfica</h1>
 
     <!-- Select para escolher o campeonato -->
     <label for="selectCampeonato">Escolha o Campeonato:</label>
@@ -90,19 +104,23 @@
     <button onclick="gerarTabelaEGraficos()">Gerar Tabela e Gráficos</button>
 
     <!-- Div para exibir o gráfico de oscilações acumuladas -->
-    <h2>Gráfico</h2>
+    <h2 class="title">Oscilação Acumulada do Mercado</h2>
+
 
     <div id="graficoContagemAcumulada"></div>
 
-    <div id="analiseDetalhada"></div>
+    <!-- Div para exibir o gráfico de oscilações linha a linha -->
+
+    <button id="toggleSubidas">Subidas</button>
+    <button id="toggleDescidas">Descidas</button>
+    <button id="toggleLateralGreen">Lateralizações Sim/Over</button>
+    <button id="toggleLateralRed">Lateralizações Não/Under</button>
+    <h2>Oscilação Acumulada das Linhas</h2>
+    <div id="graficoContagemLinha"></div>
 
     <!-- Tabela para exibir os resultados -->
-    <h2>Tabela de Jogos</h2>
+    <h2 class="title">Tabela de Jogos</h2>
     <table id="horario_fixo"></table>
-
-    <!-- Div para exibir o gráfico de oscilações linha a linha -->
-    <h2>Gráfico de Contagens Linha a Linha</h2>
-    <div id="graficoContagemLinha"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="scripts/contagem_grafica.js"></script>

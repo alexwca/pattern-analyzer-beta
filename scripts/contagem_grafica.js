@@ -8,6 +8,10 @@ function gerarTabelaEGraficos() {
     // Obter os dados do textarea
     const dataInput = document.getElementById('dataInput').value.trim();
 
+    if (!dataInput) {
+        return
+    }
+
     // Função para sanitizar os dados (remover "+" e normalizar resultados como "5+")
     function sanitizarDados(data) {
         return data.split('\n').map(row => row.trim().split(/\s+/).map(value => value.replace('+', '')));
@@ -55,69 +59,11 @@ function gerarTabelaEGraficos() {
     });
     table.appendChild(headerRow);
 
-    // Array para armazenar a oscilação acumulada e os dados de hora/minuto para o gráfico
     let oscilacaoAcumulada = [];
     let dadosGrafico = [];
     let valorOscilacao = 0;
-    let comparacoesResultados = []; // Array para armazenar os resultados comparados
+    let comparacoesResultados = [];
 
-    const mercados = {
-
-        under15: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 + time2 < 1.5;
-        },
-        ambasTimesMarcam: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 > 0 && time2 > 0;
-        },
-        over25: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 + time2 > 2.5;
-        },
-        over35: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 + time2 > 3.5;
-        },
-        over5: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 + time2 >= 5;
-        },
-        casa: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 > time2;
-        },
-        visitante: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 < time2;
-        },
-        empate: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 === time2;
-        },
-        casanao: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time1 === 0;
-        },
-        visitantenao: result => {
-            if (!result) return false;
-            const [time1, time2] = result.split('-').map(Number);
-            return time2 === 0;
-        }
-        // Adicione mais opções de mercado conforme necessário
-    };
-
-    // Função para escolher a verificação do mercado com base na seleção
-    // Função para verificar o mercado
     function verificarMercado(mercado, result) {
         if (!result) return false;
         const [time1, time2] = result.split('-').map(Number);
@@ -148,13 +94,16 @@ function gerarTabelaEGraficos() {
         }
     }
 
-
-    // Mapeia os dados para os valores de mercado selecionados
     const resultadoMercado = mosaico.map(row =>
         row.map(result => verificarMercado(mercado, result))
     );
 
-    // Apresentar os dados na tabela conforme foram inseridos (de cima para baixo)
+    let subidasArray = [];
+    let descidasArray = [];
+    let lateralSimOverArray = [];
+    let lateralNaoUnderArray = [];
+    let horaLabels = [];
+
     mosaico.forEach((row, rowIndex) => {
         const tableRow = document.createElement('tr');
         const hourCell = document.createElement('td');
@@ -165,14 +114,13 @@ function gerarTabelaEGraficos() {
 
         for (let i = 1; i <= minutos.length; i++) {
             const cell = document.createElement('td');
-            cell.innerText = row[i] || '';  // Preencher vazio se o dado estiver faltando
+            cell.innerText = row[i] || '';
 
-            // Verifique se o resultado não está vazio antes de colorir e contar
             const isPositiveMarket = resultadoMercado[rowIndex][i];
             const nextRow = mosaico[rowIndex + 1] || [];
             const isPositiveNextMarket = resultadoMercado[rowIndex + 1] ? resultadoMercado[rowIndex + 1][i] : null;
 
-            if (row[i]) {  // Verifica se o valor atual existe
+            if (row[i]) {
                 cell.classList.add(isPositiveMarket ? 'green' : 'red');
 
                 totalJogos++;
@@ -199,7 +147,6 @@ function gerarTabelaEGraficos() {
                     }
                 }
             }
-
 
         }
 
@@ -235,6 +182,12 @@ function gerarTabelaEGraficos() {
         tableRow.appendChild(totalGolsCell);
 
         table.appendChild(tableRow);
+
+
+        subidasArray.push(subidas);
+        descidasArray.push(descidas);
+        lateralSimOverArray.push(lateralSimOver);
+        lateralNaoUnderArray.push(lateralNaoUnder);
     });
 
     let acumuladoMercado = 0;
@@ -292,6 +245,8 @@ function gerarTabelaEGraficos() {
             // Armazenar os resultados comparados
             comparacoesResultados.push({ current: currentRow[i], previous: nextRow[i] });
         }
+
+        horaLabels.push(currentRow[0])
     }
 
     // Capturar o valor do ponto mais recente
@@ -312,8 +267,8 @@ function gerarTabelaEGraficos() {
     var optionsAcumulada = {
         chart: {
             type: 'line',
-            height: 350,
-            zoom: { enabled: true },
+            height: 250,
+            zoom: { enabled: false },
             toolbar: { tools: { pan: true, zoom: false } }
         },
         stroke: { width: 1 },
@@ -359,118 +314,47 @@ function gerarTabelaEGraficos() {
     chartAcumulada = new ApexCharts(document.querySelector("#graficoContagemAcumulada"), optionsAcumulada);
     chartAcumulada.render();
 
-    gerarGraficosCombinados(mosaico);
+    gerarGraficosCombinados(horaLabels, subidasArray, descidasArray, lateralSimOverArray, lateralNaoUnderArray);
+
 }
 
 
+function gerarGraficosCombinados(horas, subidas, descidas, lateralGreen, lateralRed) {
 
-function gerarGraficosCombinados(mosaico) {
-    // Arrays para armazenar as contagens de subidas, descidas e lateralizações
-    let subidasArray = [];
-    let descidasArray = [];
-    let lateralSimOverArray = [];
-    let lateralNaoUnderArray = [];
-    let horaMinutoLabels = [];
+    subidas = subidas.slice(1, -1).reverse();
+    descidas = descidas.slice(1, -1).reverse();
+    lateralGreen = lateralGreen.slice(1, -1).reverse();
+    lateralRed = lateralRed.slice(1, -1).reverse();
+    horas.pop();
 
-
-    // Percorrer a matriz de cima para baixo (última linha para a primeira)
-    for (let rowIndex = 0; rowIndex < mosaico.length - 1; rowIndex++) {
-        const currentRow = mosaico[rowIndex];
-        const nextRow = mosaico[rowIndex + 1];
-        const currentMarket = resultadoMercado[rowIndex];
-        const nextMarket = resultadoMercado[rowIndex + 1];
-
-        let subidas = 0, descidas = 0, lateralSimOver = 0, lateralNaoUnder = 0;
-
-        // Iterar sobre cada jogo
-        for (let i = 1; i <= minutos.length; i++) {
-            const isPositiveMarket = currentMarket[i];
-            const isPositiveNextMarket = nextMarket[i];
-
-            // Contagem de subidas, descidas e lateralizações
-            if (isPositiveMarket === isPositiveNextMarket) {
-                if (isPositiveMarket) {
-                    lateralSimOver++;
-                } else {
-                    lateralNaoUnder++;
-                }
-            } else {
-                if (isPositiveMarket) {
-                    subidas++;
-                } else {
-                    descidas++;
-                }
-            }
-        }
-
-        // Adicionar as contagens às arrays
-        subidasArray.push(subidas);
-        descidasArray.push(descidas);
-        lateralSimOverArray.push(lateralSimOver);
-        lateralNaoUnderArray.push(lateralNaoUnder);
-
-        // Adicionar a label da hora correspondente
-        horaMinutoLabels.push(`Hora ${currentRow[0]}`);
-    }
-
-
-    // **INVERTER** as contagens e as labels para leitura correta de baixo para cima
-    subidasArray.reverse();
-    descidasArray.reverse();
-    lateralSimOverArray.reverse();
-    lateralNaoUnderArray.reverse();
-    horaMinutoLabels.reverse();
-
-    // Verificar se o gráfico anterior existe e destruí-lo
+    // Verificar se o gráfico anterior existe e destruir
     if (chartContagem !== null) {
         chartContagem.destroy();
     }
 
-    // Gerar o gráfico combinado com todas as contagens
+
     var optionsContagem = {
         chart: {
-            type: 'line',  // Gráfico de linha
-            height: 400,
+            type: 'line',
+            height: 250,
             stacked: false,
-            zoom: {
-                enabled: true
-            }
+            zoom: { enabled: false },
+            toolbar: { tools: { pan: true, zoom: false } }
         },
         stroke: {
-            width: [2, 2, 2, 2], // Largura das linhas de cada série
-            curve: 'straight' // linhas - stepline, smooth, straight
+            width: [2, 2, 2, 2],
+            curve: 'straight'
         },
-        colors: ['#00FF00', '#FF0000', '#0000FF', '#FFFF00'], // Exemplo com vermelho, verde, azul e amarelo
+        colors: ['#28a745', '#dc3545', '#007bff', '#fd7e14'],
         series: [
-            {
-                name: 'Subidas',
-                data: subidasArray
-            },
-            {
-                name: 'Descidas',
-                data: descidasArray
-            },
-            {
-                name: 'Lateralizações Sim/Over',
-                data: lateralSimOverArray
-            },
-            {
-                name: 'Lateralizações Não/Under',
-                data: lateralNaoUnderArray
-            }
+            { name: 'Subidas', data: subidas },
+            { name: 'Descidas', data: descidas },
+            { name: 'Lateralizações Sim/Over', data: lateralGreen },
+            { name: 'Lateralizações Não/Under', data: lateralRed }
         ],
-        xaxis: {
-            categories: horaMinutoLabels // Exibir as labels da hora
-        },
-        yaxis: {
-            title: {
-                text: 'Contagens'
-            }
-        },
-        tooltip: {
-            shared: true,
-            intersect: false
-        },
+        xaxis: { categories: horas },
+        yaxis: { title: { text: 'Contagens' } },
+        // tooltip: { shared: true, intersect: false },
         legend: {
             position: 'top',
             horizontalAlign: 'right',
@@ -480,7 +364,47 @@ function gerarGraficosCombinados(mosaico) {
         }
     };
 
-    // Renderizar o gráfico dentro da div graficoContagemLinha
     chartContagem = new ApexCharts(document.querySelector("#graficoContagemLinha"), optionsContagem);
     chartContagem.render();
+
+    // Funções para mostrar/ocultar as séries ao clicar nos botões
+    document.getElementById("toggleSubidas").addEventListener("click", function () {
+        if (this.classList.contains("hidden")) {
+            chartContagem.showSeries("Subidas");
+            this.classList.remove("hidden");
+        } else {
+            chartContagem.hideSeries("Subidas");
+            this.classList.add("hidden");
+        }
+    });
+
+    document.getElementById("toggleDescidas").addEventListener("click", function () {
+        if (this.classList.contains("hidden")) {
+            chartContagem.showSeries("Descidas");
+            this.classList.remove("hidden");
+        } else {
+            chartContagem.hideSeries("Descidas");
+            this.classList.add("hidden");
+        }
+    });
+
+    document.getElementById("toggleLateralGreen").addEventListener("click", function () {
+        if (this.classList.contains("hidden")) {
+            chartContagem.showSeries("Lateralizações Sim/Over");
+            this.classList.remove("hidden");
+        } else {
+            chartContagem.hideSeries("Lateralizações Sim/Over");
+            this.classList.add("hidden");
+        }
+    });
+
+    document.getElementById("toggleLateralRed").addEventListener("click", function () {
+        if (this.classList.contains("hidden")) {
+            chartContagem.showSeries("Lateralizações Não/Under");
+            this.classList.remove("hidden");
+        } else {
+            chartContagem.hideSeries("Lateralizações Não/Under");
+            this.classList.add("hidden");
+        }
+    });
 }
