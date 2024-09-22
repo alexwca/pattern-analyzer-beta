@@ -368,8 +368,9 @@ function gerarGraficosCombinados(horas, subidas, descidas, lateralGreen, lateral
             strokeColors: '#2980b9',  // Cor da borda do ponto
             strokeWidth: 1,  // Largura da borda do ponto
             hover: {
-                size: 4  // Tamanho do ponto ao passar o mouse
+                size: 6  // Tamanho do ponto ao passar o mouse
             }
+        }
     };
 
     chartContagem = new ApexCharts(document.querySelector("#graficoContagemLinha"), optionsContagem);
