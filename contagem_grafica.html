@@ -73,7 +73,7 @@
     <h1 class="title">Contagem Gráfica</h1>
 
     <!-- Select para escolher o campeonato -->
-    <label for="selectCampeonato">Escolha o Campeonato:</label>
+    <label for="selectCampeonato">Liga:</label>
     <select id="selectCampeonato" onchange="gerarTabelaEGraficos()">
         <option value="copa">Copa</option>
         <option value="euro">Euro</option>
@@ -82,7 +82,7 @@
     </select>
 
     <!-- Select para escolher o mercado -->
-    <label for="selectMercado">Escolha o Mercado:</label>
+    <label for="selectMercado">Mercado:</label>
     <select id="selectMercado" onchange="gerarTabelaEGraficos()">
         <option value="under15">Under 1.5</option>
         <option value="ambas">Ambas Sim</option>
@@ -94,7 +94,20 @@
         <option value="empate">Empate</option>
         <option value="casanao">Casa Não</option>
         <option value="visitantenao">Visitante Não</option>
-    </select><br><br>
+    </select>
+
+    <label for="selectMercado">Linha de Refrência:</label>
+    <select id="linhaComparacao" onchange="gerarTabelaEGraficos()">
+        <option value="1">20</option>
+        <option value="2">40</option>
+        <option value="3">60</option>
+        <option value="4">80</option>
+        <option value="5">100</option>
+        <option value="6">120</option>
+        <!-- Adicione mais opções conforme necessário -->
+      </select>
+
+      <br><br>
 
     <!-- Textarea para entrada de dados -->
     <textarea id="dataInput" style="width: 100%; height: 100px;"

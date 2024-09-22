@@ -4,20 +4,22 @@ let mosaico = [];
 let resultadoMercado = [];
 let minutos = [];
 
+// Função principal para gerar a tabela e os gráficos
 function gerarTabelaEGraficos() {
     // Obter os dados do textarea
     const dataInput = document.getElementById('dataInput').value.trim();
-
     if (!dataInput) {
-        return
+        return;
     }
+
+    // Pegar o valor do select que define quantas linhas comparar
+    const linhasComparacao = parseInt(document.getElementById('linhaComparacao').value);  // Select que define quantas linhas comparar
 
     // Função para sanitizar os dados (remover "+" e normalizar resultados como "5+")
     function sanitizarDados(data) {
         return data.split('\n').map(row => row.trim().split(/\s+/).map(value => value.replace('+', '')));
     }
 
-    // Sanitizar o mosaico de dados logo após a entrada do usuário
     const mosaico = sanitizarDados(dataInput);
 
     // Obter o campeonato selecionado
@@ -34,9 +36,7 @@ function gerarTabelaEGraficos() {
 
     // Pegar a tabela onde os dados serão exibidos
     const table = document.getElementById('horario_fixo');
-
-    // Limpar qualquer conteúdo anterior da tabela
-    table.innerHTML = '';
+    table.innerHTML = '';  // Limpar qualquer conteúdo anterior da tabela
 
     // Criar uma linha de cabeçalho
     const headerRow = document.createElement('tr');
@@ -63,7 +63,9 @@ function gerarTabelaEGraficos() {
     let dadosGrafico = [];
     let valorOscilacao = 0;
     let comparacoesResultados = [];
+    let acumuladoMercado = 0;  // Inicializando a variável
 
+    // Função para verificar o mercado
     function verificarMercado(mercado, result) {
         if (!result) return false;
         const [time1, time2] = result.split('-').map(Number);
@@ -94,9 +96,7 @@ function gerarTabelaEGraficos() {
         }
     }
 
-    const resultadoMercado = mosaico.map(row =>
-        row.map(result => verificarMercado(mercado, result))
-    );
+    const resultadoMercado = mosaico.map(row => row.map(result => verificarMercado(mercado, result)));
 
     let subidasArray = [];
     let descidasArray = [];
@@ -190,12 +190,10 @@ function gerarTabelaEGraficos() {
         lateralNaoUnderArray.push(lateralNaoUnder);
     });
 
-    let acumuladoMercado = 0;
-
-    // Comparação das linhas de baixo para cima (para o gráfico)
-    for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
+    // Comparação das linhas com base no select escolhido pelo usuário (linhasComparacao)
+    for (let rowIndex = mosaico.length - 1 - linhasComparacao; rowIndex >= 0; rowIndex--) {
         const currentRow = mosaico[rowIndex];
-        const nextRow = mosaico[rowIndex + 1];
+        const nextRow = mosaico[rowIndex + linhasComparacao];  // Comparando com o número de linhas selecionado
 
         // Garantir que currentRow e nextRow são válidos e que têm dados
         if (!currentRow || !nextRow || currentRow.length === 0 || nextRow.length === 0) {
@@ -203,7 +201,7 @@ function gerarTabelaEGraficos() {
         }
 
         const currentMarket = resultadoMercado[rowIndex];
-        const nextMarket = resultadoMercado[rowIndex + 1];
+        const nextMarket = resultadoMercado[rowIndex + linhasComparacao];  // Comparação com o número de linhas
 
         let subidas = 0, descidas = 0, lateralSimOver = 0, lateralNaoUnder = 0;
 
@@ -246,7 +244,7 @@ function gerarTabelaEGraficos() {
             comparacoesResultados.push({ current: currentRow[i], previous: nextRow[i] });
         }
 
-        horaLabels.push(currentRow[0])
+        horaLabels.push(currentRow[0]);
     }
 
     // Capturar o valor do ponto mais recente
@@ -296,18 +294,6 @@ function gerarTabelaEGraficos() {
             hover: {
                 size: 6  // Tamanho do ponto ao passar o mouse
             }
-        },
-        tooltip: {
-            custom: function ({ dataPointIndex }) {
-                const { hora, minuto, oscilacao } = dadosGrafico[dataPointIndex];
-                const { current, previous } = comparacoesResultados[dataPointIndex];
-                return `<div style="padding:5px;">
-                            <strong>Hora:</strong> ${hora}:${minuto < 10 ? '0' + minuto : minuto}<br>
-                            <strong>Operacional:</strong> ${current || "N/A"}<br>
-                            <strong>Comparativa:</strong> ${previous || "N/A"}<br>
-                            <strong>Ponto no gráfico:</strong> ${oscilacao}<br>
-                        </div>`;
-            }
         }
     };
 
@@ -315,8 +301,10 @@ function gerarTabelaEGraficos() {
     chartAcumulada.render();
 
     gerarGraficosCombinados(horaLabels, subidasArray, descidasArray, lateralSimOverArray, lateralNaoUnderArray);
-
 }
+
+
+
 
 
 function gerarGraficosCombinados(horas, subidas, descidas, lateralGreen, lateralRed) {
