@@ -294,6 +294,18 @@ function gerarTabelaEGraficos() {
             hover: {
                 size: 6  // Tamanho do ponto ao passar o mouse
             }
+        },
+        tooltip: {
+            custom: function ({ dataPointIndex }) {
+                const { hora, minuto, oscilacao } = dadosGrafico[dataPointIndex];
+                const { current, previous } = comparacoesResultados[dataPointIndex];
+                return `<div style="padding:5px;">
+                            <strong>Hora:</strong> ${hora}:${minuto < 10 ? '0' + minuto : minuto}<br>
+                            <strong>Operacional:</strong> ${current || "N/A"}<br>
+                            <strong>Comparativa:</strong> ${previous || "N/A"}<br>
+                            <strong>Ponto no gráfico:</strong> ${oscilacao}<br>
+                        </div>`;
+            }
         }
     };
 
