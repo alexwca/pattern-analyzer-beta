@@ -266,8 +266,8 @@ function gerarTabelaEGraficos() {
         chart: {
             type: 'line',
             height: 250,
-            zoom: { enabled: false },
-            toolbar: { tools: { pan: true, zoom: false } }
+            zoom: { enabled: true },
+            toolbar: { tools: { pan: true, zoom: true } }
         },
         stroke: { width: 1 },
         series: [{ name: 'Oscilação Acumulada', data: oscilacaoAcumulada }],
