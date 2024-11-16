@@ -149,7 +149,7 @@ function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
                 } else {
                     acumulado += result ? 1 : -1;
                 }
-                oscilacoes.unshift(acumulado);
+                oscilacoes.push(acumulado);
             });
         }
 
