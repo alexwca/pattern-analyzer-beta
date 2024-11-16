@@ -2,6 +2,15 @@ let chartUnderOver = null;
 let chartAmbas = null;
 let chartCasaVisitante = null;
 
+document.getElementById('btn').addEventListener('click', function () {
+    // Torna visível a área de resultados
+    const resultadoAnalise = document.getElementById('graficos');
+    resultadoAnalise.style.display = 'block';
+
+    // Chama a função para gerar a tabela e os gráficos
+    gerarTabelaEGraficos();
+});
+
 
 const mercadosUnderOver = ['under25', 'over25'];
 const mercadosAmbas = ['ambas', 'ambasNao'];
@@ -40,6 +49,7 @@ function gerarTabelaEGraficos() {
     const labelsHoraMaisMinuto = gerarLabelsHoraMaisMinuto(minutos, mosaico);
 
     gerarTodosGraficos(dadosOscilacao, labelsHoraMaisMinuto);
+
 }
 
 
@@ -134,18 +144,23 @@ function gerarTabela(minutos, mosaico, resultadosMercados) {
 }
 
 function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
+
+
+
     return [...mercadosUnderOver, ...mercadosAmbas, ...mercadosCasaVisitante].map(mercado => {
         let acumulado = 0;
         const oscilacoes = [];
 
         for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
             const currentRow = resultadosMercados[mercado][rowIndex].slice(1);
-            const nextRow = resultadosMercados[mercado][rowIndex + 1].slice(1);
-
+            const nextRow = resultadosMercados[mercado][rowIndex + 1].slice(1);            
+            
             currentRow.forEach((result, colIndex) => {
                 const nextResult = nextRow[colIndex];
+                
                 if (result === nextResult) {
                     acumulado += 0;
+                    
                 } else {
                     acumulado += result ? 1 : -1;
                 }
@@ -160,34 +175,23 @@ function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
     });
 }
 
+
 function gerarLabelsHoraMaisMinuto(minutos, mosaico) {
     const labels = [];
 
-    mosaico.forEach((row, rowIndex) => {
-        // Obter a hora base da primeira coluna da linha
-        const horaBase = row[0];
 
-        // Verificar se a hora base é válida (deve ser apenas HH)
-        if (!horaBase || isNaN(horaBase)) {
-            console.warn(`Hora inválida na linha ${rowIndex}: ${horaBase}`);
-            return; // Ignorar linhas inválidas
+    for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
+        const currentRow = mosaico[rowIndex].slice(1);
+        const hora = mosaico[rowIndex][0];
+
+        for(let label = 0; label < currentRow.length; label++) {
+            labels.push(`${hora < 10 ? '0' + hora : hora}:${minutos[label] < 10 ? '0' + minutos[label] : minutos[label]}`);   
         }
-
-        const horaInicial = parseInt(horaBase, 10); // Converter para número
-
-        // Gerar os labels de hora e minuto com base nos minutos
-        minutos.forEach(minutoOffset => {
-            const minutoTotal = minutoOffset;
-            const hora = horaInicial + Math.floor(minutoTotal / 60); // Ajustar a hora, se necessário
-            const minuto = minutoTotal % 60; // Calcular os minutos restantes
-            labels.push(`${hora < 10 ? '0' + hora : hora}:${minuto < 10 ? '0' + minuto : minuto}`);
-        });
-    });
+        
+    }
 
     return labels;
 }
-
-
 
 function gerarTodosGraficos(dadosOscilacao, labelsHoraMaisMinuto) {
     geraGraficosPorCategoria(dadosOscilacao, mercadosUnderOver, 'graficoUnderOver', 'controlesUnderOver', labelsHoraMaisMinuto);
@@ -264,7 +268,7 @@ function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, co
             }
         }
     };
-    
+
 
     const chart = new Chart(ctx, {
         type: 'line',
