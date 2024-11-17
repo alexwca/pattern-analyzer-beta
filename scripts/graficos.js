@@ -1,6 +1,5 @@
 let chartUnderOver = null;
 let chartAmbas = null;
-let chartCasaVisitante = null;
 
 document.getElementById('btn').addEventListener('click', function () {
     // Torna visível a área de resultados
@@ -13,20 +12,13 @@ document.getElementById('btn').addEventListener('click', function () {
 
 
 const mercadosUnderOver = ['under25', 'over25'];
-const mercadosAmbas = ['ambas', 'ambasNao'];
-const mercadosCasaVisitante = ['casa', 'visitante'];
+const mercadosAmbas = ['ambasNao', 'ambas'];
 
 const todasCores = {
-    over15: '#FF4500',
-    under15: '#8B0000',
-    over25: '#1E90FF',
-    under25: '#228B22',
-    over35: '#FF8C00',
-    under35: '#FFD700',
-    ambas: '#800080',
-    ambasNao: '#FF69B4',
-    casa: '#FFA500',
-    visitante: '#DC143C'
+    under25: '#f53246',
+    over25: '#6bf58b',
+    ambas: '#6bf58b',
+    ambasNao: '#f53246',
 };
 
 function gerarTabelaEGraficos() {
@@ -38,7 +30,7 @@ function gerarTabelaEGraficos() {
     const mosaico = sanitizarDados(dataInput);
 
     const resultadosMercados = {};
-    [...mercadosUnderOver, ...mercadosAmbas, ...mercadosCasaVisitante].forEach(mercado => {
+    [...mercadosUnderOver, ...mercadosAmbas].forEach(mercado => {
         resultadosMercados[mercado] = verificarResultadosMercado(mosaico, mercado);
     });
 
@@ -95,12 +87,6 @@ function verificarResultadosMercado(mosaico, mercado) {
                     return time1 > 0 && time2 > 0;
                 case 'ambasNao':
                     return !(time1 > 0 && time2 > 0);
-                case 'casa':
-                    return time1 > time2;
-                case 'visitante':
-                    return time1 < time2;
-                default:
-                    return false;
             }
         })
     );
@@ -132,7 +118,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados) {
             const cell = document.createElement('td');
             cell.innerText = value || '';
 
-            const mercadoAtivo = [...mercadosUnderOver, ...mercadosAmbas, ...mercadosCasaVisitante].some(
+            const mercadoAtivo = [...mercadosUnderOver, ...mercadosAmbas].some(
                 mercado => resultadosMercados[mercado][rowIndex][i]
             );
             cell.classList.add(mercadoAtivo ? 'green' : 'red');
@@ -147,20 +133,20 @@ function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
 
 
 
-    return [...mercadosUnderOver, ...mercadosAmbas, ...mercadosCasaVisitante].map(mercado => {
+    return [...mercadosUnderOver, ...mercadosAmbas].map(mercado => {
         let acumulado = 0;
         const oscilacoes = [];
 
         for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
             const currentRow = resultadosMercados[mercado][rowIndex].slice(1);
-            const nextRow = resultadosMercados[mercado][rowIndex + 1].slice(1);            
-            
+            const nextRow = resultadosMercados[mercado][rowIndex + 1].slice(1);
+
             currentRow.forEach((result, colIndex) => {
                 const nextResult = nextRow[colIndex];
-                
+
                 if (result === nextResult) {
                     acumulado += 0;
-                    
+
                 } else {
                     acumulado += result ? 1 : -1;
                 }
@@ -180,15 +166,19 @@ function gerarLabelsHoraMaisMinuto(minutos, mosaico) {
     const labels = [];
 
 
+
     for (let rowIndex = mosaico.length - 2; rowIndex >= 0; rowIndex--) {
         const currentRow = mosaico[rowIndex].slice(1);
         const hora = mosaico[rowIndex][0];
 
-        for(let label = 0; label < currentRow.length; label++) {
-            labels.push(`${hora < 10 ? '0' + hora : hora}:${minutos[label] < 10 ? '0' + minutos[label] : minutos[label]}`);   
+        for (let label = 0; label < currentRow.length; label++) {
+            labels.push(`${hora < 10 ? '0' + hora : hora}:${minutos[label] < 10 ? '0' + minutos[label] : minutos[label]}`);
         }
-        
+
     }
+
+    console.log(labels)
+
 
     return labels;
 }
@@ -196,7 +186,6 @@ function gerarLabelsHoraMaisMinuto(minutos, mosaico) {
 function gerarTodosGraficos(dadosOscilacao, labelsHoraMaisMinuto) {
     geraGraficosPorCategoria(dadosOscilacao, mercadosUnderOver, 'graficoUnderOver', 'controlesUnderOver', labelsHoraMaisMinuto);
     geraGraficosPorCategoria(dadosOscilacao, mercadosAmbas, 'graficoAmbas', 'controlesAmbas', labelsHoraMaisMinuto);
-    geraGraficosPorCategoria(dadosOscilacao, mercadosCasaVisitante, 'graficoCasaVisitante', 'controlesCasaVisitante', labelsHoraMaisMinuto);
 }
 
 function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, controlesId, labels) {
@@ -208,9 +197,6 @@ function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, co
     } else if (canvasId === 'graficoAmbas' && chartAmbas) {
         chartAmbas.destroy();
         chartAmbas = null;
-    } else if (canvasId === 'graficoCasaVisitante' && chartCasaVisitante) {
-        chartCasaVisitante.destroy();
-        chartCasaVisitante = null;
     }
 
     const datasets = dadosOscilacao
@@ -223,14 +209,14 @@ function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, co
             fill: false,
             tension: 0.4,
             pointStyle: 'circle',
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            pointRadius: 3.5,
+            pointHoverRadius: 4,
             pointBackgroundColor: 'transparent',
             pointBorderColor: todasCores[dados.mercado]
         }));
 
     const data = {
-        labels, // Usa as labels com hora e minuto
+        labels,
         datasets
     };
 
@@ -280,8 +266,6 @@ function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, co
         chartUnderOver = chart;
     } else if (canvasId === 'graficoAmbas') {
         chartAmbas = chart;
-    } else if (canvasId === 'graficoCasaVisitante') {
-        chartCasaVisitante = chart;
     }
 
     configurarControleDeMercados(dadosOscilacao, mercadosIniciais, chart, controlesId);
