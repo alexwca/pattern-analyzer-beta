@@ -2,14 +2,20 @@ let chartUnderOver = null;
 let chartAmbas = null;
 
 document.getElementById('btn').addEventListener('click', function () {
-    // Torna visÃ­vel a Ã¡rea de resultados
     const resultadoAnalise = document.getElementById('graficos');
     resultadoAnalise.style.display = 'block';
-
-    // Chama a funÃ§Ã£o para gerar a tabela e os grÃ¡ficos
     gerarTabelaEGraficos();
 });
 
+const buttons = document.getElementsByClassName('btnTables');
+const tables = ['tabelao25', 'tabelaambas'];
+
+for (let index = 0; index < tables.length; index++) {
+
+    buttons[index].addEventListener('click', () => {
+        mostrarEsconderTabela(tables[index])
+    })
+}
 
 const mercadosUnderOver = ['under25', 'over25'];
 const mercadosAmbas = ['ambasNao', 'ambas'];
@@ -62,16 +68,12 @@ function gerarMinutosPorLiga(liga) {
 function sanitizarDados(data) {
     return data.split('\n').map((row, rowIndex) => {
         const columns = row.trim().split(/\s+/);
-
-        // Validar se a primeira coluna Ã© uma hora vÃ¡lida (formato HH)
         if (!columns[0] || isNaN(columns[0])) {
             console.warn(`Hora invÃ¡lida na linha ${rowIndex}: ${columns[0]}`);
         }
-
         return columns.map(value => value.replace('+', ''));
     });
 }
-
 
 function verificarResultadosMercado(mosaico, mercado) {
     return mosaico.map(row =>
@@ -92,50 +94,64 @@ function verificarResultadosMercado(mosaico, mercado) {
     );
 }
 
-function gerarTabela(minutos, mosaico, resultadosMercados) {
-    const table = document.getElementById('horario_fixo');
-    table.innerHTML = '';
+function gerarTabela(minutos, mosaico) {
 
-    const headerRow = document.createElement('tr');
-    const headerCell = document.createElement('th');
-    headerCell.innerText = 'Hora';
-    headerRow.appendChild(headerCell);
+    const tabelas = ['tabelao25', 'tabelaambas'];
 
-    minutos.forEach(minuto => {
-        const th = document.createElement('th');
-        th.innerText = `${minuto < 10 ? '0' + minuto : minuto}`;
-        headerRow.appendChild(th);
-    });
-    table.appendChild(headerRow);
+    tabelas.forEach((mercado) => {
 
-    mosaico.forEach((row, rowIndex) => {
-        const tableRow = document.createElement('tr');
-        const hourCell = document.createElement('td');
-        hourCell.innerText = row[0] < 10 ? `0${row[0]}` : row[0];
-        hourCell.classList.add('firstCollumn')
-        tableRow.appendChild(hourCell);
+        const table = document.getElementById(mercado);
+        table.innerHTML = '';
 
-        row.slice(1).forEach((value, i) => {
-            const cell = document.createElement('td');
-            cell.innerText = value || '';
+        const headerRow = document.createElement('tr');
+        const headerCell = document.createElement('th');
+        headerCell.innerText = 'Hora';
+        headerRow.appendChild(headerCell);
 
-            const [time1, time2] = value.split('-').map(Number);
-            if((time1 + time2) > 2) {
-                cell.classList.add('green');
-            } else {
-                cell.classList.add('red');
-            }
-
-            tableRow.appendChild(cell);
+        minutos.forEach(minuto => {
+            const th = document.createElement('th');
+            th.innerText = `${minuto < 10 ? '0' + minuto : minuto}`;
+            headerRow.appendChild(th);
         });
+        table.appendChild(headerRow);
 
-        table.appendChild(tableRow);
-    });
+        mosaico.forEach((row, rowIndex) => {
+            const tableRow = document.createElement('tr');
+            const hourCell = document.createElement('td');
+            hourCell.innerText = row[0] < 10 ? `0${row[0]}` : row[0];
+            hourCell.classList.add('firstCollumn')
+            tableRow.appendChild(hourCell);
+
+            row.slice(1).forEach((value, i) => {
+                const cell = document.createElement('td');
+                cell.innerText = value || '';
+
+                const [time1, time2] = value.split('-').map(Number);
+
+                if (mercado == 'tabelaover') {
+                    if ((time1 + time2) > 2) {
+                        cell.classList.add('green');
+                    } else {
+                        cell.classList.add('red');
+                    }
+                }
+                else {
+                    if (time1 > 0 && time2 > 0) {
+                        cell.classList.add('green');
+                    } else {
+                        cell.classList.add('red');
+                    }
+                }
+
+                tableRow.appendChild(cell);
+            });
+
+            table.appendChild(tableRow);
+        });
+    })
 }
 
 function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
-
-
 
     return [...mercadosUnderOver, ...mercadosAmbas].map(mercado => {
         let acumulado = 0;
@@ -239,9 +255,9 @@ function geraGraficosPorCategoria(dadosOscilacao, mercadosIniciais, canvasId, co
                     text: 'HorÃ¡rio'
                 },
                 ticks: {
-                    maxRotation: 0, // Impede a rotaÃ§Ã£o excessiva das labels
-                    autoSkip: true, // Pula labels automaticamente
-                    stepSize: 5 // Ajusta o espaÃ§amento entre os pontos exibidos (alterar conforme necessÃ¡rio)
+                    maxRotation: 0, 
+                    autoSkip: true,
+                    stepSize: 5 
                 }
             },
             y: {
@@ -320,4 +336,18 @@ function atualizarGrafico(dadosOscilacao, chart, controlesId) {
 
     chart.data.datasets = datasets;
     chart.update();
+}
+
+function mostrarEsconderTabela(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        if (element.style.display === 'none' || getComputedStyle(element).display === 'none') {
+            element.style.display = 'table';
+        } else {
+            element.style.display = 'none';
+        }
+    } else {
+        console.error(`Elemento com ID "${elementId}" não encontrado.`);
+    }
+
 }

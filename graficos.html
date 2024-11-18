@@ -53,10 +53,26 @@
             resize: none;
         }
 
+        .hidden {
+            visibility: hidden;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .visible {
+            visibility: visible;
+            opacity: 1;
+            height: auto;
+            transition: opacity 0.3s ease;
+        }
+
         table {
-            width: 100%;
+            width: 100% !important;
             border-collapse: collapse;
             cursor: pointer;
+            table-layout: fixed;
         }
 
         table,
@@ -87,7 +103,7 @@
 
         .table,
         #graficos {
-            position: relative;
+            position: sticky;
             width: 100%;
             padding: 20px;
         }
@@ -117,6 +133,21 @@
         .firstCollumn {
             color: #181818 !important;
         }
+
+        .btnTables {
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #2e86de;
+            color: #e2e8ee;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .btnTables:hover {
+            background-color: #194877;
+        }
     </style>
 </head>
 
@@ -141,25 +172,19 @@
         <div>
             <div id="controlesUnderOver" style="margin-bottom: 20px;"></div>
             <canvas id="graficoUnderOver"></canvas>
+            <div class="table">
+                <button type="button" class="btnTables">Mostrar/Esconder Tabela</button>
+                <table id="tabelao25"></table>
+            </div>
         </div>
-
         <div>
             <div id="controlesAmbas" style="margin-bottom: 20px;"></div>
             <canvas id="graficoAmbas"></canvas>
+            <div class="table">
+                <button type="button" class="btnTables">Mostrar/Esconder Tabela</button>
+                <table id="tabelaambas"></table>
+            </div>
         </div>
-    </div>
-
-    <div class="table">
-        <label for="selectMercado">Selecione o Mercado:</label>
-        <select id="selectMercado">
-            <option value="ambasSim">Ambas Sim</option>
-            <option value="ambasNao">Ambas Não</option>
-            <option value="casa">Casa Vence</option>
-            <option value="visitante">Visitante Vence</option>
-            <option value="over25">Over 2.5</option>
-            <option value="under25">Under 2.5</option>
-        </select>
-        <table id="horario_fixo"></table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
