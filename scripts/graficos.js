@@ -111,7 +111,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados) {
     mosaico.forEach((row, rowIndex) => {
         const tableRow = document.createElement('tr');
         const hourCell = document.createElement('td');
-        hourCell.innerText = row[0];
+        hourCell.innerText = row[0] < 10 ? `0${row[0]}` : row[0];
         hourCell.classList.add('firstCollumn')
         tableRow.appendChild(hourCell);
 
