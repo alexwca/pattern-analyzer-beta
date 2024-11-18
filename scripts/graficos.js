@@ -112,6 +112,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados) {
         const tableRow = document.createElement('tr');
         const hourCell = document.createElement('td');
         hourCell.innerText = row[0];
+        hourCell.classList.add('firstCollumn')
         tableRow.appendChild(hourCell);
 
         row.slice(1).forEach((value, i) => {
@@ -124,7 +125,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados) {
             } else {
                 cell.classList.add('red');
             }
-            
+
             tableRow.appendChild(cell);
         });
 
