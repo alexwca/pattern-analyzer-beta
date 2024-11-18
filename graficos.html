@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -65,19 +66,13 @@
             border: 1px solid black;
         }
 
-        th,
-        td {
+        table th,
+        table td {
+            border: 1px solid #ddd;
             padding: 10px;
             text-align: center !important;
             font-size: 16px !important;
-            padding: 5px;
-        }
-
-        table th,
-        table td {
-            padding: 2px;
-            border: 1px solid #ddd;
-            text-align: left;
+            padding: 10px;
         }
 
         table th {
@@ -110,15 +105,15 @@
             font-size: 1.2rem;
         }
 
-        /* .green {
-            background-color: #d4edda;
-            color: #6bf58b;
+        
+
+        .green {
+            background-color: #28a745;
         }
 
         .red {
-            background-color: #f8d7da;
-            color: #f53246;
-        } */
+            background-color: #dc3545;
+        }
     </style>
 </head>
 
@@ -139,8 +134,6 @@
         <button id="btn">GERAR ANÁLISE</button>
     </div>
 
-
-
     <div id="graficos">
         <div>
             <div id="controlesUnderOver" style="margin-bottom: 20px;"></div>
@@ -150,11 +143,6 @@
         <div>
             <div id="controlesAmbas" style="margin-bottom: 20px;"></div>
             <canvas id="graficoAmbas"></canvas>
-        </div>
-
-        <div>
-            <div id="controlesCasaVisitante" style="margin-bottom: 20px;"></div>
-            <canvas id="graficoCasaVisitante"></canvas>
         </div>
     </div>
 
