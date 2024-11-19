@@ -115,20 +115,20 @@ function gerarTabela(minutos, mosaico) {
         });
         table.appendChild(headerRow);
 
-        mosaico.forEach((row, rowIndex) => {
+        mosaico.forEach((row) => {
             const tableRow = document.createElement('tr');
             const hourCell = document.createElement('td');
             hourCell.innerText = row[0] < 10 ? `0${row[0]}` : row[0];
             hourCell.classList.add('firstCollumn')
             tableRow.appendChild(hourCell);
 
-            row.slice(1).forEach((value, i) => {
+            row.slice(1).forEach((value) => {
                 const cell = document.createElement('td');
                 cell.innerText = value || '';
 
                 const [time1, time2] = value.split('-').map(Number);
 
-                if (mercado == 'tabelaover') {
+                if (mercado === 'tabelao25') {
                     if ((time1 + time2) > 2) {
                         cell.classList.add('green');
                     } else {
