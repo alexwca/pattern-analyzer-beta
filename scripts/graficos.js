@@ -261,6 +261,8 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
             table.appendChild(tableRow);
         });
     });
+
+    ativarDestaquePontos()
 }
 
 function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
@@ -308,6 +310,42 @@ function gerarLabelsHoraMaisMinuto(minutos, mosaico) {
 
     return labels;
 }
+
+function ativarDestaquePontos() {
+    const cellsWithPoints = document.querySelectorAll('td span.pontosGraficos');
+
+    cellsWithPoints.forEach(span => {
+        span.addEventListener('click', function () {
+            const ponto = this.innerText; // Ponto do span clicado
+            const isHighlighted = this.parentElement.classList.contains('highlight'); // Verifica se já está destacado
+
+            if (isHighlighted) {
+                // Remove o destaque de todas as células com o mesmo ponto
+                const allCells = document.querySelectorAll('td span.pontosGraficos');
+                allCells.forEach(otherSpan => {
+                    if (otherSpan.innerText === ponto) {
+                        otherSpan.parentElement.classList.remove('highlight');
+                    }
+                });
+            } else {
+                // Remove os destaques globais
+                document.querySelectorAll('.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                });
+
+                // Adiciona o destaque nas células com o mesmo ponto
+                const allCells = document.querySelectorAll('td span.pontosGraficos');
+                allCells.forEach(otherSpan => {
+                    if (otherSpan.innerText === ponto) {
+                        otherSpan.parentElement.classList.add('highlight');
+                    }
+                });
+            }
+        });
+    });
+}
+
+
 
 function gerarTodosGraficos(dadosOscilacao, labelsHoraMaisMinuto) {
     geraGraficosPorCategoria(dadosOscilacao, mercadosUnderOver, 'graficoUnderOver', 'controlesUnderOver', labelsHoraMaisMinuto);
