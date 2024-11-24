@@ -210,12 +210,12 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
             headerRow.appendChild(th);
         });
 
-        // const icones = ['％', '⬆️', '↔️', '⬇️', '⇆', '⚽'];
-        // icones.forEach(icone => {
-        //     const th = document.createElement('th');
-        //     th.innerText = icone;
-        //     headerRow.appendChild(th);
-        // });
+        const icones = ['％', '⬆️', '↔️', '⬇️', '⇆', '⚽'];
+        icones.forEach(icone => {
+            const th = document.createElement('th');
+            th.innerText = icone;
+            headerRow.appendChild(th);
+        });
 
         table.appendChild(headerRow);
 
@@ -227,6 +227,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
             hourCell.classList.add('firstCollumn');
             tableRow.appendChild(hourCell);
 
+            // Adiciona células para os resultados
             row.slice(1).forEach((value, colIndex) => {
                 const cell = document.createElement('td');
                 cell.innerText = value || '';
@@ -250,7 +251,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
                 if (oscilacoesPorMercado[mercado][rowIndex] && oscilacoesPorMercado[mercado][rowIndex][colIndex] !== undefined) {
                     const oscilacao = oscilacoesPorMercado[mercado][rowIndex][colIndex];
                     const spanOscilacao = document.createElement('span');
-                    spanOscilacao.classList.add('pontosGraficos')
+                    spanOscilacao.classList.add('pontosGraficos');
                     spanOscilacao.innerText = `p: ${oscilacao}`;
                     cell.appendChild(spanOscilacao);
                 }
@@ -258,11 +259,102 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
                 tableRow.appendChild(cell);
             });
 
+            // Preenche células vazias se a linha não tiver o número total de minutos
+            const colunasRestantes = minutos.length - row.slice(1).length;
+            for (let i = 0; i < colunasRestantes; i++) {
+                const emptyCell = document.createElement('td');
+                emptyCell.innerText = '';
+                tableRow.appendChild(emptyCell);
+            }
+
+            // Adiciona as colunas adicionais ao final da linha
+            const porcentagemMercadoCell = document.createElement('td');
+            porcentagemMercadoCell.innerText = calcularPorcentagemLinha(rowIndex, resultadosMercados[mercado]);
+            tableRow.appendChild(porcentagemMercadoCell);
+
+            const subidasCell = document.createElement('td');
+            subidasCell.innerText = calcularSubidasLinha(rowIndex, resultadosMercados, mercado);
+            tableRow.appendChild(subidasCell);
+
+            const lateralizacoesOverCell = document.createElement('td');
+            lateralizacoesOverCell.innerText = calcularLateralizacaoVerde(rowIndex, resultadosMercados, mercado, mercado);
+            tableRow.appendChild(lateralizacoesOverCell);
+
+            const descidasCell = document.createElement('td');
+            descidasCell.innerText = calcularDescidasLinha(rowIndex, resultadosMercados, mercado);
+            tableRow.appendChild(descidasCell);
+
+            const lateralizacoesUnderCell = document.createElement('td');
+            lateralizacoesUnderCell.innerText = calcularLateralizacaoVermelho(rowIndex, resultadosMercados, mercado, mercado);
+            tableRow.appendChild(lateralizacoesUnderCell);
+
+            const golsCell = document.createElement('td');
+            golsCell.innerText = calcularGolsLinha(row);
+            tableRow.appendChild(golsCell);
+
             table.appendChild(tableRow);
         });
     });
 
-    ativarDestaquePontos()
+    ativarDestaquePontos();
+}
+
+// Funções auxiliares
+function calcularPorcentagemLinha(rowIndex, resultadosMercado) {
+    const total = resultadosMercado[rowIndex].slice(1).length;
+    const ocorrencias = resultadosMercado[rowIndex].slice(1).filter(Boolean).length;
+    return `${Math.round((ocorrencias / total) * 100)}%`;
+}
+
+function calcularSubidasLinha(rowIndex, resultadosMercados, mercado) {
+    return calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, true, false);
+}
+
+function calcularDescidasLinha(rowIndex, resultadosMercados, mercado) {
+    return calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, false, true);
+}
+
+
+function calcularLateralizacaoVerde(rowIndex, resultadosMercados, mercado) {
+    return calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, true, true);
+}
+
+function calcularLateralizacaoVermelho(rowIndex, resultadosMercados, mercado) {
+    return calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, false, false);
+}
+
+// function calcularLateralizacoesLinha(rowIndex, resultadosMercados, mercadoAtual, mercadoComparado) {
+//     return calcularMovimentosLinha(rowIndex, resultadosMercados, mercadoAtual, mercadoComparado, mercadoComparado);
+// }
+
+function calcularGolsLinha(row) {
+    return row.slice(1).reduce((total, value) => {
+        const [time1, time2] = value.split('-').map(Number);
+        return total + time1 + time2;
+    }, 0);
+}
+
+function calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, condicao1, condicao2) {
+    let contador = 0;
+    const currentRow = resultadosMercados[mercado][rowIndex];
+    const nextRow = resultadosMercados[mercado][rowIndex + 1];
+
+    if (!nextRow) return contador;
+
+    currentRow.slice(1).forEach((result, colIndex) => {
+        const nextResult = nextRow[colIndex + 1];
+        if ((result === condicao1) && (nextResult === condicao2)) {
+            contador++;
+        }
+    });
+
+    return contador;
+}
+
+function gerarDadosContagem(resultados) {
+
+    console.log(resultados)
+    
 }
 
 function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
