@@ -189,16 +189,89 @@ function gerarContagensTabela(resultadosMercados, tabelas) {
     });
 }
 
+function calcularPorcentagemColunas(mosaico, mercado, resultadosMercados) {
+    const porcentagens = [];
+    const totalLinhas = mosaico.length - 1;
+
+    for (let colIndex = 1; colIndex <= 20; colIndex++) {
+        let count = 0;
+
+        for (let rowIndex = 1; rowIndex < mosaico.length; rowIndex++) {
+            if (resultadosMercados[mercado] && resultadosMercados[mercado][rowIndex]) {
+                const result = resultadosMercados[mercado][rowIndex][colIndex];
+                if (result) {
+                    count++;
+                }
+            }
+        }
+        const porcentagem = totalLinhas > 0 ? ((count / totalLinhas) * 100).toFixed(0) : 0;
+        porcentagens.push(porcentagem);
+    }
+
+    return porcentagens;
+}
+
+function calcularPorcentagemPorBlocos(porcentagens) {
+    const blocos = [];
+    let soma = 0;
+
+    porcentagens.forEach((porcentagem, index) => {
+        soma += parseInt(porcentagem, 10); // Garante que seja tratado como número
+        if ((index + 1) % 5 === 0) { // A cada 5 colunas, adiciona ao bloco
+            blocos.push(soma / 5); // Calcula a média
+            soma = 0; // Reseta a soma para o próximo bloco
+        }
+    });
+
+    return blocos;
+}
+
 
 function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado) {
+
     const tabelas = ['tabelao25', 'tabelaambas'];
 
     tabelas.forEach((mercadoTabela, tabelaIndex) => {
-        const mercado = tabelaIndex === 0 ? 'over25' : 'ambas'; // Relaciona tabela com mercado
+        const mercado = tabelaIndex === 0 ? 'over25' : 'ambas';
         const table = document.getElementById(mercadoTabela);
         table.innerHTML = '';
 
-        // Cabeçalho
+        const porcentagens = calcularPorcentagemColunas(mosaico, mercado, resultadosMercados)
+        const porcentagensBloco = calcularPorcentagemPorBlocos(porcentagens)
+        
+        const porcentagemBloco = document.createElement('tr');
+        const porcentagemCellBloco = document.createElement('td');
+        porcentagemCellBloco.classList.add('percentCell');
+        porcentagemCellBloco.innerText = '%';
+        porcentagemBloco.appendChild(porcentagemCellBloco);
+
+        for (let index = 0; index < porcentagensBloco.length; index++) {
+            const porcentagemCellsBloco = document.createElement('td');
+            porcentagemCellsBloco.setAttribute('colspan', '5');
+            porcentagemCellsBloco.innerText = `${porcentagensBloco[index]}%`;
+            porcentagemCellsBloco.classList.add('percentCell');
+            porcentagemCellsBloco.classList.add((porcentagensBloco[index] > 42) ? 'text-green' : 'text-red');
+            porcentagemBloco.appendChild(porcentagemCellsBloco);
+        }
+
+        table.appendChild(porcentagemBloco)
+
+        const porcentagemRow = document.createElement('tr');
+        const porcentagemCell = document.createElement('td');
+        porcentagemCell.classList.add('percentCell');
+        porcentagemCell.innerText = '%';
+        porcentagemRow.appendChild(porcentagemCell);
+
+        for (let index = 0; index < porcentagens.length; index++) {
+            const porcentagemCells = document.createElement('td');
+            porcentagemCells.innerText = `${porcentagens[index]}%`;
+            porcentagemCells.classList.add('percentCell');
+            porcentagemCells.classList.add((porcentagens[index] > 42) ? 'text-green' : 'text-red');
+            porcentagemRow.appendChild(porcentagemCells);
+        }
+
+        table.appendChild(porcentagemRow)
+
         const headerRow = document.createElement('tr');
         const headerCell = document.createElement('th');
         headerCell.innerText = 'Hora';
@@ -354,7 +427,7 @@ function calcularMovimentosLinha(rowIndex, resultadosMercados, mercado, condicao
 function gerarDadosContagem(resultados) {
 
     console.log(resultados)
-    
+
 }
 
 function calcularOscilacaoPorMercado(mosaico, resultadosMercados) {
