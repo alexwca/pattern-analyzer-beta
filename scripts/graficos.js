@@ -237,7 +237,6 @@ function calcularMediaPorcetagensLinhas(tabelaId) {
             const celulaPorcentagem = linha.querySelector('td:nth-last-child(6)');
             if (celulaPorcentagem) {
                 const valor = parseInt(celulaPorcentagem.innerText.replace('%', '').trim(), 10);
-                console.log(index)
                 if (!isNaN(valor)) {
                     soma += valor;
                     contador++;
@@ -269,8 +268,6 @@ function calcularMediaSubidas(tabelaId) {
                     soma += valor;
                     contador++;
                 }
-
-                console.log(celulaSubida)
             }
         }
     });
