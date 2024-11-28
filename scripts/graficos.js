@@ -226,6 +226,61 @@ function calcularPorcentagemPorBlocos(porcentagens) {
     return blocos;
 }
 
+function calcularMediaPorcetagensLinhas(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = tabela.querySelectorAll('tr');
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+        if (index > 1) {
+            const celulaPorcentagem = linha.querySelector('td:nth-last-child(6)');
+            if (celulaPorcentagem) {
+                const valor = parseInt(celulaPorcentagem.innerText.replace('%', '').trim(), 10);
+                console.log(index)
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / contador).toFixed(2))}%` : 0;
+
+    const mediaColunaPorcentagens = document.getElementById(`${tabelaId}mediaColunaPorcentagens`);
+    mediaColunaPorcentagens.innerText = media;
+    
+}
+
+function calcularMediaSubidas(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = tabela.querySelectorAll('tr');
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+        if (index > 1) { 
+            const celulaSubida = linha.querySelector('td:nth-last-child(8)');
+            if (celulaSubida) {
+                const valor = parseInt(celulaSubida.innerText.replace('%', '').trim(), 10);
+
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+
+                console.log(celulaSubida)
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}%` : 0;
+
+    const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaSubidas`);
+    mediaColunaSubidas.innerText = media;
+    
+}
 
 function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado) {
 
@@ -238,7 +293,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
 
         const porcentagens = calcularPorcentagemColunas(mosaico, mercado, resultadosMercados)
         const porcentagensBloco = calcularPorcentagemPorBlocos(porcentagens)
-        
+
         const porcentagemBloco = document.createElement('tr');
         const porcentagemCellBloco = document.createElement('td');
         porcentagemCellBloco.classList.add('percentCell');
@@ -272,26 +327,38 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
 
         table.appendChild(porcentagemRow)
 
+        const mediaColunaPorcentagens = document.createElement('td');
+        mediaColunaPorcentagens.setAttribute('id', `${mercadoTabela}mediaColunaPorcentagens`);
+        porcentagemRow.appendChild(mediaColunaPorcentagens);
+
+        table.appendChild(porcentagemRow);
+
+        const mediaColunaSubidas = document.createElement('td');
+        mediaColunaSubidas.setAttribute('id', `${mercadoTabela}mediaColunaSubidas`);
+        porcentagemRow.appendChild(mediaColunaSubidas);
+
+        table.appendChild(porcentagemRow);
+        
         const headerRow = document.createElement('tr');
         const headerCell = document.createElement('th');
         headerCell.innerText = 'Hora';
         headerRow.appendChild(headerCell);
-
+        
         minutos.forEach(minuto => {
             const th = document.createElement('th');
             th.innerText = `${minuto < 10 ? '0' + minuto : minuto}`;
             headerRow.appendChild(th);
         });
-
+        
         const icones = ['％', '⬆️', '↔️', '⬇️', '⇆', '⚽'];
         icones.forEach(icone => {
             const th = document.createElement('th');
             th.innerText = icone;
             headerRow.appendChild(th);
         });
-
+        
         table.appendChild(headerRow);
-
+        
         // Linhas
         mosaico.forEach((row, rowIndex) => {
             const tableRow = document.createElement('tr');
@@ -299,12 +366,12 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
             hourCell.innerText = row[0] < 10 ? `0${row[0]}` : row[0];
             hourCell.classList.add('firstCollumn');
             tableRow.appendChild(hourCell);
-
+            
             // Adiciona células para os resultados
             row.slice(1).forEach((value, colIndex) => {
                 const cell = document.createElement('td');
                 cell.innerText = value || '';
-
+                
                 // Cor para os mercados
                 const [time1, time2] = value.split('-').map(Number);
                 if (mercado === 'over25') {
@@ -320,7 +387,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
                         cell.classList.add('red');
                     }
                 }
-
+                
                 if (oscilacoesPorMercado[mercado][rowIndex] && oscilacoesPorMercado[mercado][rowIndex][colIndex] !== undefined) {
                     const oscilacao = oscilacoesPorMercado[mercado][rowIndex][colIndex];
                     const spanOscilacao = document.createElement('span');
@@ -328,10 +395,10 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
                     spanOscilacao.innerText = `p: ${oscilacao}`;
                     cell.appendChild(spanOscilacao);
                 }
-
+                
                 tableRow.appendChild(cell);
             });
-
+            
             // Preenche células vazias se a linha não tiver o número total de minutos
             const colunasRestantes = minutos.length - row.slice(1).length;
             for (let i = 0; i < colunasRestantes; i++) {
@@ -339,36 +406,39 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
                 emptyCell.innerText = '';
                 tableRow.appendChild(emptyCell);
             }
-
+            
             // Adiciona as colunas adicionais ao final da linha
             const porcentagemMercadoCell = document.createElement('td');
             porcentagemMercadoCell.innerText = calcularPorcentagemLinha(rowIndex, resultadosMercados[mercado]);
             tableRow.appendChild(porcentagemMercadoCell);
-
+            
             const subidasCell = document.createElement('td');
             subidasCell.innerText = calcularSubidasLinha(rowIndex, resultadosMercados, mercado);
             tableRow.appendChild(subidasCell);
-
+            
             const lateralizacoesOverCell = document.createElement('td');
             lateralizacoesOverCell.innerText = calcularLateralizacaoVerde(rowIndex, resultadosMercados, mercado, mercado);
             tableRow.appendChild(lateralizacoesOverCell);
-
+            
             const descidasCell = document.createElement('td');
             descidasCell.innerText = calcularDescidasLinha(rowIndex, resultadosMercados, mercado);
             tableRow.appendChild(descidasCell);
-
+            
             const lateralizacoesUnderCell = document.createElement('td');
             lateralizacoesUnderCell.innerText = calcularLateralizacaoVermelho(rowIndex, resultadosMercados, mercado, mercado);
             tableRow.appendChild(lateralizacoesUnderCell);
-
+            
             const golsCell = document.createElement('td');
             golsCell.innerText = calcularGolsLinha(row);
             tableRow.appendChild(golsCell);
-
+            
             table.appendChild(tableRow);
+
+            calcularMediaPorcetagensLinhas(mercadoTabela);
+            // calcularMediaSubidas(mercadoTabela);
         });
     });
-
+    
     ativarDestaquePontos();
 }
 
