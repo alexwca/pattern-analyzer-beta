@@ -254,15 +254,16 @@ function calcularMediaPorcetagensLinhas(tabelaId) {
 
 function calcularMediaSubidas(tabelaId) {
     const tabela = document.getElementById(tabelaId); 
-    const linhas = tabela.querySelectorAll('tr');
+    const linhas = Array.from(tabela.getElementsByClassName('subidasCell'));
     let soma = 0;
     let contador = 0;
 
     linhas.forEach((linha, index) => {
-        if (index > 1) { 
-            const celulaSubida = linha.querySelector('td:nth-last-child(8)');
+
+        if (index > 0) { 
+            const celulaSubida = linha.innerText;
             if (celulaSubida) {
-                const valor = parseInt(celulaSubida.innerText.replace('%', '').trim(), 10);
+                const valor = parseInt(celulaSubida.trim(), 10);
 
                 if (!isNaN(valor)) {
                     soma += valor;
@@ -272,9 +273,122 @@ function calcularMediaSubidas(tabelaId) {
         }
     });
 
-    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}%` : 0;
+    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}` : 0;
 
     const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaSubidas`);
+    mediaColunaSubidas.innerText = media;
+    
+}
+
+function calcularMediaLateralizacaoOver(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = Array.from(tabela.getElementsByClassName('lateralizacoesOverCell'));
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+
+        if (index > 0) { 
+            const celulaSubida = linha.innerText;
+            if (celulaSubida) {
+                const valor = parseInt(celulaSubida.trim(), 10);
+
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}` : 0;
+
+    const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaLateralizacoesOver`);
+    mediaColunaSubidas.innerText = media;
+    
+}
+
+function calcularMediaDescidas(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = Array.from(tabela.getElementsByClassName('descidasCell'));
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+
+        if (index > 0) { 
+            const celulaSubida = linha.innerText;
+            if (celulaSubida) {
+                const valor = parseInt(celulaSubida.trim(), 10);
+
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}` : 0;
+
+    const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaDescidas`);
+    mediaColunaSubidas.innerText = media;
+    
+}
+
+function calcularMediaLateralizacoesUnder(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = Array.from(tabela.getElementsByClassName('lateralizacoesUnderCell'));
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+
+        if (index > 0) { 
+            const celulaSubida = linha.innerText;
+            if (celulaSubida) {
+                const valor = parseInt(celulaSubida.trim(), 10);
+
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / (contador - 1)).toFixed(2))}` : 0;
+
+    const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaLateralizacoesUnder`);
+    mediaColunaSubidas.innerText = media;
+    
+}
+
+function calcularMediaGols(tabelaId) {
+    const tabela = document.getElementById(tabelaId); 
+    const linhas = Array.from(tabela.getElementsByClassName('golsCell'));
+    let soma = 0;
+    let contador = 0;
+
+    linhas.forEach((linha, index) => {
+
+        if (index > 0 && index < linhas.length) { 
+            console.log(linha)
+            const celulaSubida = linha.innerText;
+            if (celulaSubida) {
+                const valor = parseInt(celulaSubida.trim(), 10);
+
+                if (!isNaN(valor)) {
+                    soma += valor;
+                    contador++;
+                }
+            }
+        }
+    });
+
+    const media = contador > 0 ? `${Math.ceil((soma / (contador)).toFixed(2))}` : 0;
+
+    const mediaColunaSubidas = document.getElementById(`${tabelaId}mediaColunaGols`);
     mediaColunaSubidas.innerText = media;
     
 }
@@ -333,6 +447,30 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
         const mediaColunaSubidas = document.createElement('td');
         mediaColunaSubidas.setAttribute('id', `${mercadoTabela}mediaColunaSubidas`);
         porcentagemRow.appendChild(mediaColunaSubidas);
+
+        table.appendChild(porcentagemRow);
+
+        const mediaColunaLateralizacoesOver = document.createElement('td');
+        mediaColunaLateralizacoesOver.setAttribute('id', `${mercadoTabela}mediaColunaLateralizacoesOver`);
+        porcentagemRow.appendChild(mediaColunaLateralizacoesOver);
+
+        table.appendChild(porcentagemRow);
+
+        const mediaColunaDescidas = document.createElement('td');
+        mediaColunaDescidas.setAttribute('id', `${mercadoTabela}mediaColunaDescidas`);
+        porcentagemRow.appendChild(mediaColunaDescidas);
+
+        table.appendChild(porcentagemRow);
+
+        const mediaColunaLateralizacoesUnder = document.createElement('td');
+        mediaColunaLateralizacoesUnder.setAttribute('id', `${mercadoTabela}mediaColunaLateralizacoesUnder`);
+        porcentagemRow.appendChild(mediaColunaLateralizacoesUnder);
+
+        table.appendChild(porcentagemRow);
+
+        const mediaColunaGols = document.createElement('td');
+        mediaColunaGols.setAttribute('id', `${mercadoTabela}mediaColunaGols`);
+        porcentagemRow.appendChild(mediaColunaGols);
 
         table.appendChild(porcentagemRow);
         
@@ -410,30 +548,40 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
             tableRow.appendChild(porcentagemMercadoCell);
             
             const subidasCell = document.createElement('td');
+            subidasCell.classList.add('subidasCell');
             subidasCell.innerText = calcularSubidasLinha(rowIndex, resultadosMercados, mercado);
             tableRow.appendChild(subidasCell);
             
             const lateralizacoesOverCell = document.createElement('td');
+            lateralizacoesOverCell.classList.add('lateralizacoesOverCell');
             lateralizacoesOverCell.innerText = calcularLateralizacaoVerde(rowIndex, resultadosMercados, mercado, mercado);
             tableRow.appendChild(lateralizacoesOverCell);
             
             const descidasCell = document.createElement('td');
+            descidasCell.classList.add('descidasCell');
             descidasCell.innerText = calcularDescidasLinha(rowIndex, resultadosMercados, mercado);
             tableRow.appendChild(descidasCell);
             
             const lateralizacoesUnderCell = document.createElement('td');
+            lateralizacoesUnderCell.classList.add('lateralizacoesUnderCell');
             lateralizacoesUnderCell.innerText = calcularLateralizacaoVermelho(rowIndex, resultadosMercados, mercado, mercado);
             tableRow.appendChild(lateralizacoesUnderCell);
             
             const golsCell = document.createElement('td');
+            golsCell.classList.add('golsCell');
             golsCell.innerText = calcularGolsLinha(row);
             tableRow.appendChild(golsCell);
             
             table.appendChild(tableRow);
 
-            calcularMediaPorcetagensLinhas(mercadoTabela);
-            // calcularMediaSubidas(mercadoTabela);
         });
+
+        calcularMediaPorcetagensLinhas(mercadoTabela);
+        calcularMediaSubidas(mercadoTabela);
+        calcularMediaLateralizacaoOver(mercadoTabela);
+        calcularMediaDescidas(mercadoTabela);
+        calcularMediaLateralizacoesUnder(mercadoTabela);
+        calcularMediaGols(mercadoTabela);
     });
     
     ativarDestaquePontos();
