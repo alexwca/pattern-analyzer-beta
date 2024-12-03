@@ -399,14 +399,14 @@ function adicionarLinhaSomaGols(tabelaId, mosaico) {
         return;
     }
 
-    const somaGolsPorColuna = Array(20).fill(0); 
+    const somaGolsPorColuna = Array(20).fill(0);
 
     mosaico.forEach((row, rowIndex) => {
         if (rowIndex > 0) {
             row.slice(1, 21).forEach((cell, colIndex) => {
-                const valores = cell.split('-').map(Number); 
+                const valores = cell.split('-').map(Number);
                 if (valores.length === 2 && !isNaN(valores[0]) && !isNaN(valores[1])) {
-                    somaGolsPorColuna[colIndex] += valores[0] + valores[1]; 
+                    somaGolsPorColuna[colIndex] += valores[0] + valores[1];
                 }
             });
         }
@@ -420,11 +420,11 @@ function adicionarLinhaSomaGols(tabelaId, mosaico) {
     somaGolsPorColuna.forEach(soma => {
         const cell = document.createElement('td');
         cell.innerText = soma || 0;
-        cell.classList.add('somaGolsCell'); 
+        cell.classList.add('somaGolsCell');
         linhaSoma.appendChild(cell);
     });
 
-    const colunasExtras = 6; 
+    const colunasExtras = 6;
     for (let i = 0; i < colunasExtras; i++) {
         const emptyCell = document.createElement('td');
         linhaSoma.appendChild(emptyCell);
@@ -432,6 +432,66 @@ function adicionarLinhaSomaGols(tabelaId, mosaico) {
 
     tabela.insertBefore(linhaSoma, tabela.querySelector('tr:nth-child(3)'));
 }
+
+function adicionarLinhaOscilacaoColunas(tabelaId, mosaico) {
+    const tabela = document.getElementById(tabelaId);
+
+    // Cria uma nova linha para a oscilação
+    const LinhaOscilacaoColunasPorcentagem = document.createElement('tr');
+    const LinhaOscilacaoColunasPorcentagemIcone = document.createElement('td');
+    LinhaOscilacaoColunasPorcentagemIcone.innerHTML = '📈'; // Ícone de gráfico
+    LinhaOscilacaoColunasPorcentagem.appendChild(LinhaOscilacaoColunasPorcentagemIcone);
+
+    // Insere a linha logo abaixo da linha de porcentagens
+
+    const linhas = tabela.getElementsByTagName('tr');
+    const porcentagens = Array.from(linhas[1].querySelectorAll('td')).slice(1); // Obtém porcentagens da linha
+    const resultados = mosaico[0].slice(1); // Obtém os resultados da primeira linha do mosaico
+
+    let acumulado = 0; // Variável para acumular os valores de oscilação
+
+    porcentagens.forEach((porcentagemCelula, index) => {
+        const porcentagem = parseFloat(porcentagemCelula.innerText.replace('%', '').trim()); // Obtém a porcentagem como número
+        const resultado = resultados[index]; // Resultado atual da coluna
+        const cell = document.createElement('td'); // Nova célula para a linha de oscilação
+
+        // Verifica o resultado
+        if (resultado) {
+            const [time1, time2] = resultado.split('-').map(Number);
+            const isOver = (time1 + time2) > 2.5; // Verifica se o resultado é Over
+
+            if (isOver && porcentagem > 42) {
+                // Over com porcentagem Over -> lateraliza
+                cell.innerText = acumulado;
+                cell.classList.add('green'); // Aplica cor verde
+            } else if (!isOver && porcentagem <= 42) {
+                // Under com porcentagem Under -> lateraliza
+                cell.innerText = acumulado;
+                cell.classList.add('red'); // Aplica cor vermelha
+            } else if (isOver && porcentagem <= 42) {
+                // Over com porcentagem Under -> sobe
+                acumulado += 1;
+                cell.innerText = acumulado;
+                cell.classList.add('green');
+            } else if (!isOver && porcentagem > 42) {
+                // Under com porcentagem Over -> desce
+                acumulado -= 1;
+                cell.innerText = acumulado;
+                cell.classList.add('red');
+            }
+        } else {
+            // Caso não tenha resultado, mantém vazio
+            cell.innerText = '';
+        }
+
+        LinhaOscilacaoColunasPorcentagem.appendChild(cell);
+    });
+
+    // tabela.appendChild(LinhaOscilacaoColunasPorcentagem);
+    
+    tabela.insertBefore(LinhaOscilacaoColunasPorcentagem, tabela.querySelector('tr:nth-child(3)'));
+}
+
 
 
 function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado) {
@@ -446,6 +506,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
         const porcentagens = calcularPorcentagemColunas(mosaico, mercado, resultadosMercados)
         const porcentagensBloco = calcularPorcentagemPorBlocos(porcentagens)
 
+        /* LINHA DE PORCENTAGEM DOS BLOCOS */
         const porcentagemBloco = document.createElement('tr');
         const porcentagemCellBloco = document.createElement('td');
         porcentagemCellBloco.classList.add('percentCell');
@@ -462,6 +523,9 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
         }
 
         table.appendChild(porcentagemBloco)
+
+
+        /* LINHA DE PORCENTAGEM DASCOLUNAS */
 
         const porcentagemRow = document.createElement('tr');
         const porcentagemCell = document.createElement('td');
@@ -514,6 +578,7 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
         porcentagemRow.appendChild(mediaColunaGols);
 
         table.appendChild(porcentagemRow);
+
 
         const headerRow = document.createElement('tr');
         const headerCell = document.createElement('th');
@@ -624,7 +689,8 @@ function gerarTabela(minutos, mosaico, resultadosMercados, oscilacoesPorMercado)
         calcularMediaLateralizacoesUnder(mercadoTabela);
         calcularMediaGols(mercadoTabela);
         adicionarLinhaSomaGols(mercadoTabela, mosaico);
-        
+        adicionarLinhaOscilacaoColunas(mercadoTabela, mosaico)
+
     });
 
     ativarDestaquePontos();
